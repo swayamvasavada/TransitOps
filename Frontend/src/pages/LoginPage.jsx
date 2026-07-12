@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   CircleCheck,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // ---------------------------------------------------------------------------
 // Design tokens — a dispatch-console palette: near-black chassis, signal-amber
@@ -193,6 +194,7 @@ function RoleSelect({ value, onChange }) {
 // Login page
 // ---------------------------------------------------------------------------
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -216,7 +218,8 @@ export default function LoginPage() {
     setTimeout(() => {
       setLoading(false);
       setSuccess(true);
-      // In the real app, replace this with navigate("/dashboard")
+      // navigate to dashboard after showing success briefly
+      setTimeout(() => navigate("/dashboard"), 700);
       setTimeout(() => setSuccess(false), 2200);
     }, 1300);
   };

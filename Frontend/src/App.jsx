@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import "./App.css";
 import LoginPage from "./pages/LoginPage";
-// import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard";
 // import TripDispatchPage from "./pages/TripDispatchPage";
 // import Maintenance from "./pages/Maintenance";
 // import TripandExpScreen from "./pages/TripandExpScreen";
@@ -22,9 +22,9 @@ function AppContent() {
       {/* <div className="flex min-h-screen"> */}
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        {/* <Route path="/signup" element={<SignUp />} />
+        {/* <Route path="/signup" element={<SignUp />} /> */}
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/vehicle-registry" element={<VehicleRegistry />} />
+        {/* <Route path="/vehicle-registry" element={<VehicleRegistry />} />
         <Route path="/trip-dispatcher" element={<TripDispatchPage />} />
         <Route path="/maintenance" element={<Maintenance />} />
         <Route path="/trip-expense" element={<TripandExpScreen />} />
