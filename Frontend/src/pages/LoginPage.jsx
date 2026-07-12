@@ -132,7 +132,7 @@ function RoleSelect({ value, onChange }) {
 
       {open && (
         <div
-          className="absolute z-20 left-0 right-0 mt-2 rounded-xl overflow-hidden p-1.5"
+          className="absolute z-20 left-0 right-0 bottom-full mb-2 rounded-xl overflow-hidden p-1.5"
           style={{
             background: c.surfaceRaised,
             border: `1px solid ${c.borderStrong}`,
