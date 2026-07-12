@@ -1,0 +1,6 @@
+services:
+  transitops:
+    build: .
+    container_name: transitops
+    ports:
+      - "5000:8080"
