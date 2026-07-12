@@ -15,6 +15,7 @@ import {
   CircleCheck,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "../store/AuthStore";
 
 // ---------------------------------------------------------------------------
 // Design tokens — a dispatch-console palette: near-black chassis, signal-amber
@@ -200,28 +201,38 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState("Dispatcher");
   const [remember, setRemember] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+   const { login, loading } = useAuthStore();
 
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+
     if (!email || !password) {
-      setError("Invalid credentials. Account locked after 5 failed attempts.");
+      setError("Please enter email and password");
       return;
     }
+
     setError("");
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess(true);
-      // navigate to dashboard after showing success briefly
-      setTimeout(() => navigate("/dashboard"), 700);
-      setTimeout(() => setSuccess(false), 2200);
-    }, 1300);
+
+    try {
+      const response = await login(email, password);
+
+      if (response.success) {
+        setSuccess(true);
+
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 700);
+      } else {
+        setError(response.message);
+      }
+    } catch (err) {
+      setError("Something went wrong");
+    }
   };
 
   const activeRole = ROLES.find((r) => r.name === role) ?? ROLES[0];
