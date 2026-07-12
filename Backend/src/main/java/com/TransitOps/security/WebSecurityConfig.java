@@ -7,8 +7,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 @Configuration
+@EnableMethodSecurity
 public class WebSecurityConfig {
         @Autowired
         private AuthFilter authFilter;
@@ -23,7 +25,7 @@ public class WebSecurityConfig {
                                 .authorizeHttpRequests(
                                                 auth -> auth.requestMatchers("/api/auth/**").permitAll()
                                                                 .requestMatchers("/api/vehicle/**")
-                                                                .hasAllRoles("MANAGER", "DISPATCHER")
+                                                                .authenticated()
                                                                 .requestMatchers("/api/trip/**")
                                                                 .hasAnyRole("MANAGER", "DISPATCHER")
                                                                 .requestMatchers("/api/analytics/**")

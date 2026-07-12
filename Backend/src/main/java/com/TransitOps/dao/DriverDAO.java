@@ -9,4 +9,5 @@ import com.TransitOps.entity.User;
 @Repository
 public interface DriverDAO extends JpaRepository<Driver, Long> {
     Driver findByUserAndActive(User user, Boolean active);
+    Driver findByDriverIDAndActive(Long driverID, Boolean active);
 }
