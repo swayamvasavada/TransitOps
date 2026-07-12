@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { LogOut, LayoutDashboard, Truck, Navigation, Wrench, DollarSign, TrendingUp, PieChart, Settings, User } from "lucide-react";
+import useAuthStore from "../store/AuthStore";
 
 // Local palette fallback so Sidebar doesn't depend on external color file.
 const c = {
@@ -11,8 +12,11 @@ const c = {
   teal: "#2dd4bf",
 };
 
-export default function Sidebar({ isOpen, userName = "Raven K.", userRole = "Dispatcher", userEmail = "raven.k@transitops.in", onLogout }) {
+export default function Sidebar({ isOpen, onLogout }) {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
+  const userName = user?.name || "Guest";
+  const userEmail = user?.email || "";
 
   const handleLogout = () => {
     if (onLogout) onLogout();

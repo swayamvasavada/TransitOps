@@ -23,21 +23,31 @@ const useAuthStore = create((set) => ({
 
             const data = response.data;
 
-            // Save token
-            if (data.token) {
-                localStorage.setItem("token", data.token);
+            if (!data.success) {
+                set({
+                    loading: false,
+                    error: data.message,
+                });
+
+                return {
+                    success: false,
+                    message: data.message,
+                };
             }
+
+            localStorage.setItem("token", data.serviceResult.token);
+            localStorage.setItem("user", JSON.stringify(data.serviceResult));
 
             set({
                 loading: false,
-                user: data.user,
-                token: data.token,
+                user: data.serviceResult,
+                token: data.serviceResult.token,
                 error: null,
             });
 
             return {
                 success: true,
-                data,
+                data: data.serviceResult,
             };
         } catch (error) {
             set({
