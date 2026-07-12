@@ -221,6 +221,22 @@ import {
   CancelTrip,
 } from "../api/apiPath";
 
+// Helpers to normalize backend responses which may wrap data in different shapes
+const _extractList = (respData) => {
+  if (Array.isArray(respData)) return respData;
+  if (Array.isArray(respData?.serviceResult)) return respData.serviceResult;
+  if (Array.isArray(respData?.data)) return respData.data;
+  if (Array.isArray(respData?.trips)) return respData.trips;
+  return [];
+};
+
+const _extractItem = (respData) => {
+  if (!respData) return null;
+  if (respData?.serviceResult && !Array.isArray(respData.serviceResult)) return respData.serviceResult;
+  if (respData?.data && !Array.isArray(respData.data)) return respData.data;
+  return respData;
+};
+
 const useTripStore = create((set) => ({
   loading: false,
   trips: [],
@@ -261,12 +277,12 @@ const useTripStore = create((set) => ({
         status,
       });
 
-      const data = response.data;
+      const data = _extractItem(response.data);
 
       set((state) => ({
         loading: false,
         trip: data,
-        trips: [...state.trips, data],
+        trips: [...state.trips, data].filter(Boolean),
         error: null,
       }));
 
@@ -296,10 +312,11 @@ const useTripStore = create((set) => ({
       });
 
       const response = await axios.get(GetTrips);
+      const list = _extractList(response.data);
 
       set({
         loading: false,
-        trips: response.data,
+        trips: list,
         error: null,
       });
 
@@ -332,7 +349,7 @@ const useTripStore = create((set) => ({
         `${DispatchTrip}/${tripID}`
       );
 
-      const data = response.data;
+      const data = _extractItem(response.data);
 
       set((state) => ({
         loading: false,
@@ -381,7 +398,7 @@ const useTripStore = create((set) => ({
         }
       );
 
-      const data = response.data;
+      const data = _extractItem(response.data);
 
       set((state) => ({
         loading: false,
@@ -430,7 +447,7 @@ const useTripStore = create((set) => ({
         }
       );
 
-      const data = response.data;
+      const data = _extractItem(response.data);
 
       set((state) => ({
         loading: false,

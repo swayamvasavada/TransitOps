@@ -137,7 +137,7 @@ const useVehicleStore = create((set) => ({
         message: error.response?.data?.message || "Failed to delete vehicle",
       };
     }
-  },
+  },    
 
   // ================= UPDATE VEHICLE =================
   updateVehicle: async (
