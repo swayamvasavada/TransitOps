@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { ChevronDown, Check, Plus, X, Trash2 } from "lucide-react";
+import { ChevronDown, Check, Plus, X, Trash2, Edit } from "lucide-react";
 import Navbar from "../components/Navbar";
+import useVehicleStore from "../store/vehicleStore";
 
 // ---------------------------------------------------------------------------
 // Palette — same dark-console tokens as Navbar/LoginPage. Kept local so this
@@ -51,48 +52,48 @@ const STATUS_STYLES = {
 const STATUS_OPTIONS = ["All", "Available", "On Trip", "In Shop", "Retired"];
 const VEHICLE_TYPES = ["Van", "Truck", "Mini"];
 
-const initialVehicles = [
-  {
-    id: 1,
-    reg: "GJ01AB452",
-    name: "VAN-05",
-    type: "Van",
-    capacity: "500 kg",
-    odometer: 74000,
-    cost: 620000,
-    status: "Available",
-  },
-  {
-    id: 2,
-    reg: "GJ01AB998",
-    name: "TRUCK-11",
-    type: "Truck",
-    capacity: "5 Ton",
-    odometer: 182000,
-    cost: 2450000,
-    status: "On Trip",
-  },
-  {
-    id: 3,
-    reg: "GJ01AB1120",
-    name: "MINI-03",
-    type: "Mini",
-    capacity: "1 Ton",
-    odometer: 66000,
-    cost: 410000,
-    status: "In Shop",
-  },
-  {
-    id: 4,
-    reg: "GJ01AB008",
-    name: "VAN-09",
-    type: "Van",
-    capacity: "750 kg",
-    odometer: 241900,
-    cost: 590000,
-    status: "Retired",
-  },
-];
+// const initialVehicles = [
+//   {
+//     id: 1,
+//     reg: "GJ01AB452",
+//     name: "VAN-05",
+//     type: "Van",
+//     capacity: "500 kg",
+//     odometer: 74000,
+//     cost: 620000,
+//     status: "Available",
+//   },
+//   {
+//     id: 2,
+//     reg: "GJ01AB998",
+//     name: "TRUCK-11",
+//     type: "Truck",
+//     capacity: "5 Ton",
+//     odometer: 182000,
+//     cost: 2450000,
+//     status: "On Trip",
+//   },
+//   {
+//     id: 3,
+//     reg: "GJ01AB1120",
+//     name: "MINI-03",
+//     type: "Mini",
+//     capacity: "1 Ton",
+//     odometer: 66000,
+//     cost: 410000,
+//     status: "In Shop",
+//   },
+//   {
+//     id: 4,
+//     reg: "GJ01AB008",
+//     name: "VAN-09",
+//     type: "Van",
+//     capacity: "750 kg",
+//     odometer: 241900,
+//     cost: 590000,
+//     status: "Retired",
+//   },
+// ];
 
 const inr = (n) => Number(n).toLocaleString("en-IN");
 
@@ -172,7 +173,7 @@ function FilterDropdown({ label, value, options, onChange }) {
 // ---------------------------------------------------------------------------
 // Add Vehicle modal
 // ---------------------------------------------------------------------------
-function AddVehicleModal({ onSave, onCancel }) {
+function AddVehicleModal({ onSave, onCancel, loading, error, initialData }) {
   const [form, setForm] = useState({
     reg: "",
     name: "",
@@ -185,6 +186,21 @@ function AddVehicleModal({ onSave, onCancel }) {
 
   const update = (key) => (e) =>
     setForm((f) => ({ ...f, [key]: e.target.value }));
+
+  // If editing, populate form from initialData
+  useEffect(() => {
+    if (initialData) {
+      setForm({
+        reg: initialData.registrationNumber || initialData.reg || "",
+        name: initialData.name || "",
+        type: initialData.type || "Van",
+        capacity: initialData.maxLoadCapacity ? String(initialData.maxLoadCapacity) : initialData.capacity || "",
+        odometer: initialData.odometer ? String(initialData.odometer) : "",
+        cost: initialData.acquisitionCost ? String(initialData.acquisitionCost) : initialData.cost || "",
+        status: initialData.status ? (typeof initialData.status === 'string' ? initialData.status.replace(/_/g, ' ') : initialData.status) : "Available",
+      });
+    }
+  }, [initialData]);
 
   const inputStyle = {
     background: c.panel,
@@ -372,7 +388,18 @@ function AddVehicleModal({ onSave, onCancel }) {
               ))}
             </select>
           </div>
-
+          {error && (
+            <div
+              className="rounded-lg p-3 text-sm"
+              style={{
+                color: "#fb7185",
+                background: "rgba(251,113,133,.08)",
+                border: "1px solid rgba(251,113,133,.25)",
+              }}
+            >
+              {error}
+            </div>
+          )}
           <div className="flex gap-2.5 pt-2">
             <button
               type="button"
@@ -388,10 +415,11 @@ function AddVehicleModal({ onSave, onCancel }) {
             </button>
             <button
               type="submit"
-              className="flex-1 py-2.5 rounded-lg text-sm font-semibold cursor-pointer"
+              disabled={loading}
+              className="flex-1 py-2.5 rounded-lg text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
               style={{ background: c.amber, color: "#1a1200" }}
             >
-              Save Vehicle
+              {loading ? "Registering..." : initialData ? "Update Vehicle" : "Save Vehicle"}
             </button>
           </div>
         </form>
@@ -404,42 +432,65 @@ function AddVehicleModal({ onSave, onCancel }) {
 // Page
 // ---------------------------------------------------------------------------
 export default function VehicleRegistry() {
-  const [vehicles, setVehicles] = useState(initialVehicles);
+  //   const [vehicles, setVehicles] = useState(initialVehicles);
   const [showModal, setShowModal] = useState(false);
   const [typeFilter, setTypeFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
   const [regSearch, setRegSearch] = useState("");
   const [navSearch, setNavSearch] = useState("");
+  const { registerVehicle, loading, error, vehicles, getVehicles, deleteVehicle } =
+    useVehicleStore();
+  const [editingVehicle, setEditingVehicle] = useState(null);
 
   const typeOptions = useMemo(
     () => ["All", ...new Set(vehicles.map((v) => v.type))],
     [vehicles],
   );
+  useEffect(() => {
+    getVehicles();
+  }, [getVehicles]);
 
-  const handleSaveVehicle = (newVehicle) => {
-    setVehicles((prev) => [
-      ...prev,
-      {
-        id: prev.length ? Math.max(...prev.map((v) => v.id)) + 1 : 1,
-        ...newVehicle,
-      },
-    ]);
-    setShowModal(false);
+  const handleSaveVehicle = async (newVehicle) => {
+    const vehicleID = editingVehicle ? editingVehicle.vehicleID : 0;
+    const result = await registerVehicle({
+      vehicleID,
+      registrationNumber: newVehicle.reg,
+      name: newVehicle.name,
+      type: newVehicle.type,
+      maxLoadCapacity: Number(newVehicle.capacity),
+      odometer: Number(newVehicle.odometer),
+      acquisitionCost: Number(newVehicle.cost),
+      status: newVehicle.status.toUpperCase().replace(/\s+/g, "_"),
+    });
+
+    if (result.success) {
+      await getVehicles(); // Refresh the table
+      setShowModal(false);
+      setEditingVehicle(null);
+    }
   };
 
-  const handleDelete = (id) =>
-    setVehicles((prev) => prev.filter((v) => v.id !== id));
+  const handleDelete = async (vehicleID) => {
+    const result = await deleteVehicle(vehicleID);
+
+    if (result.success) {
+      console.log("Vehicle deleted successfully");
+    }
+  };
+
+  const handleEdit = (vehicle) => {
+    setEditingVehicle(vehicle);
+    setShowModal(true);
+  };
 
   const filtered = vehicles.filter((v) => {
     const matchesType = typeFilter === "All" || v.type === typeFilter;
     const matchesStatus = statusFilter === "All" || v.status === statusFilter;
-    const matchesReg = v.reg.toLowerCase().includes(regSearch.toLowerCase());
+    const regVal = (v.reg || v.registrationNumber || "").toString();
+    const matchesReg = regVal.toLowerCase().includes(regSearch.toLowerCase());
     const q = navSearch.trim().toLowerCase();
-    const matchesNav =
-      !q ||
-      [v.reg, v.name, v.type, v.status].some((f) =>
-        f.toLowerCase().includes(q),
-      );
+    const navFields = [regVal, v.name || v.vehicleName || "", v.type || "", v.status || ""];
+    const matchesNav = !q || navFields.some((f) => f.toString().toLowerCase().includes(q));
     return matchesType && matchesStatus && matchesReg && matchesNav;
   });
 
@@ -582,7 +633,7 @@ export default function VehicleRegistry() {
                         className="px-8 py-4 font-mono text-xs font-semibold"
                         style={{ color: c.textPrimary }}
                       >
-                        {v.reg}
+                        {v.reg || v.registrationNumber || v.registrationNo}
                       </td>
                       <td
                         className="px-8 py-4"
@@ -626,20 +677,24 @@ export default function VehicleRegistry() {
                           >
                             {v.status}
                           </span>
-                          <button
-                            onClick={() => handleDelete(v.id)}
-                            aria-label={`Delete ${v.reg}`}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                            style={{ color: c.textMuted }}
-                            onMouseEnter={(e) =>
-                              (e.currentTarget.style.color = c.rose)
-                            }
-                            onMouseLeave={(e) =>
-                              (e.currentTarget.style.color = c.textMuted)
-                            }
-                          >
-                            <Trash2 size={14} />
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleEdit(v)}
+                              aria-label={`Edit ${v.registrationNumber}`}
+                              className="p-1 rounded hover:bg-[rgba(255,255,255,0.02)]"
+                              style={{ color: c.textMuted }}
+                            >
+                              <Edit size={14} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(v.vehicleID)}
+                              aria-label={`Delete ${v.registrationNumber}`}
+                              className="p-1 rounded hover:bg-[rgba(255,255,255,0.02)]"
+                              style={{ color: c.textMuted }}
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
                         </div>
                       </td>
                     </tr>
@@ -667,8 +722,14 @@ export default function VehicleRegistry() {
 
       {showModal && (
         <AddVehicleModal
+          initialData={editingVehicle}
           onSave={handleSaveVehicle}
-          onCancel={() => setShowModal(false)}
+          onCancel={() => {
+            setShowModal(false);
+            setEditingVehicle(null);
+          }}
+          loading={loading}
+          error={error}
         />
       )}
     </div>
