@@ -4,6 +4,8 @@ import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,8 +29,12 @@ public class Driver {
     @JoinColumn(name = "UserID")
     private User user;
 
-    @Column(name = "IsAvailable")
-    private Boolean isAvailable;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "Status")
+    private com.TransitOps.util.DriverStatus status;
+
+    @Column(name = "SafetyScore")
+    private Double safetyScore;
 
     @Column(name = "LicenseNo")
     private String licenseNo;

@@ -12,7 +12,6 @@ import com.TransitOps.dto.UserDTO;
 import com.TransitOps.entity.Driver;
 import com.TransitOps.entity.User;
 import com.TransitOps.util.Role;
-import com.TransitOps.service.AuthService;
 
 @Service
 public class UserService {
@@ -52,7 +51,8 @@ public class UserService {
             driver.setUser(user);
             driver.setLicenseNo(userDTO.getLicenseNo());
             driver.setLicenseExpiryDate(userDTO.getLicenseExpiryDate());
-            driver.setIsAvailable(true);
+            driver.setStatus(com.TransitOps.util.DriverStatus.AVAILABLE);
+            driver.setSafetyScore(100.0); // Default safety score
             driver.setActive(true);
             driver.setCreatedAt(new Date());
             driver.setUpdatedAt(new Date());
