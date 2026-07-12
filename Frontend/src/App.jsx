@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import "./App.css";
 import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
 import Dashboard from "./pages/Dashboard";
 import Drivers from "./pages/Drivers";
 import TripDispatchPage from "./pages/TripDispatchPage";
@@ -25,6 +26,7 @@ function AppContent() {
         <Route path="/" element={<LoginPage />} />
         {/* <Route path="/signup" element={<SignUp />} /> */}
         <Route path="/reset-password/:token" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/vehicle-registry" element={<VehicleRegistry />} />
         <Route path="/drivers" element={<Drivers />} />

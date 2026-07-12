@@ -212,7 +212,7 @@
 // export default useTripStore;
 
 import { create } from "zustand";
-import axios from "axios";
+import axios from "../api/axiosClient";
 import {
   RegisterTrip,
   GetTrips,

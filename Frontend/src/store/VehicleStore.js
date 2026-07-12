@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import axios from "axios";
+import axios from "../api/axiosClient";
 import { RegisterVehicle, GetVehicles, DeleteVehicle } from "../api/apiPath";
 
 const useVehicleStore = create((set) => ({
