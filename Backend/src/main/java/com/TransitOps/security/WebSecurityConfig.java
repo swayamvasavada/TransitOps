@@ -30,6 +30,8 @@ public class WebSecurityConfig {
                                                                 .hasAnyRole("MANAGER", "DISPATCHER")
                                                                 .requestMatchers("/api/log/**")
                                                                 .authenticated()
+                                                                .requestMatchers("/api/maintenance/**")
+                                                                .hasAnyRole("MANAGER", "DISPATCHER")
                                                                 .requestMatchers("/api/analytics/**")
                                                                 .hasRole("MANAGER")
                                                                 .anyRequest().permitAll())
