@@ -12,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ResponseDTO {
-	private Integer success;
+	private Boolean success;
     private String message;
     Object serviceResult;
 }

@@ -35,18 +35,18 @@ public class AuthController {
             authService.sendVerificationMail(email);
             responseDTO.setServiceResult("Email sent successfully");
             responseDTO.setMessage("Email sent successfully");
-            responseDTO.setSuccess(1);
+            responseDTO.setSuccess(true);
         } catch (ResourceNotFoundExcepiton e) {
             e.printStackTrace();
             responseDTO.setServiceResult(e.getMessage());
             responseDTO.setMessage(e.getMessage());
-            responseDTO.setSuccess(0);
+            responseDTO.setSuccess(false);
             return new ResponseEntity<>(responseDTO, HttpStatusCode.valueOf(404));
         } catch (Exception e) {
             e.printStackTrace();
             responseDTO.setServiceResult("Failed to create verification link");
             responseDTO.setMessage("Failed to create verification link");
-            responseDTO.setSuccess(0);
+            responseDTO.setSuccess(false);
 
             return new ResponseEntity<>(responseDTO, HttpStatusCode.valueOf(500));
         }
@@ -67,28 +67,28 @@ public class AuthController {
             
             if (loginDTO.getIsVerified()) {
                 responseDTO.setMessage("Signed in successfully");
-                responseDTO.setSuccess(1);
+                responseDTO.setSuccess(true);
             } else {
                 responseDTO.setMessage("Email is not verified");
-                responseDTO.setSuccess(0);
+                responseDTO.setSuccess(false);
             }
         } catch (ResourceNotFoundExcepiton e) {
             e.printStackTrace();
             responseDTO.setServiceResult(e.getMessage());
             responseDTO.setMessage(e.getMessage());
-            responseDTO.setSuccess(0);
+            responseDTO.setSuccess(false);
             return new ResponseEntity<>(responseDTO, HttpStatusCode.valueOf(404));
         } catch (AuthenticationException e) {
             e.printStackTrace();
             responseDTO.setServiceResult(e.getMessage());
             responseDTO.setMessage(e.getMessage());
-            responseDTO.setSuccess(0);
+            responseDTO.setSuccess(false);
             return new ResponseEntity<>(responseDTO, HttpStatusCode.valueOf(401));
         } catch (Exception e) {
             e.printStackTrace();
             responseDTO.setServiceResult("Failed to login");
             responseDTO.setMessage("Failed to login");
-            responseDTO.setSuccess(0);
+            responseDTO.setSuccess(false);
 
             return new ResponseEntity<>(responseDTO, HttpStatusCode.valueOf(500));
         }
@@ -107,18 +107,18 @@ public class AuthController {
             authService.verifyUser(token);
             responseDTO.setServiceResult("User verified successfully");
             responseDTO.setMessage("User verified successfully");
-            responseDTO.setSuccess(1);
+            responseDTO.setSuccess(true);
         } catch (ResourceNotFoundExcepiton e) {
             e.printStackTrace();
             responseDTO.setServiceResult(e.getMessage());
             responseDTO.setMessage(e.getMessage());
-            responseDTO.setSuccess(0);
+            responseDTO.setSuccess(false);
             return new ResponseEntity<>(responseDTO, HttpStatusCode.valueOf(404));
         } catch (Exception e) {
             e.printStackTrace();
             responseDTO.setServiceResult("Failed to verify user");
             responseDTO.setMessage("Failed to verify user");
-            responseDTO.setSuccess(0);
+            responseDTO.setSuccess(false);
 
             return new ResponseEntity<>(responseDTO, HttpStatusCode.valueOf(500));
         }
@@ -126,4 +126,64 @@ public class AuthController {
         System.out.println("Exiting from AuthController -> verifyEmail");
         return ResponseEntity.ok(responseDTO);
     }
+
+    @GetMapping("/request-reset-password")
+	public ResponseEntity<ResponseDTO> requestResetPassword(@RequestParam(required = true) String email) {
+		System.out.println("Entering into AuthController -> requestResetPassword");
+
+		ResponseDTO responseDTO = new ResponseDTO();
+
+		try {
+			authService.requestPasswordReset(email);
+			responseDTO.setServiceResult("Password reset link sent successfully");
+			responseDTO.setMessage("Password reset link sent successfully");
+			responseDTO.setSuccess(Boolean.TRUE);
+		} catch (ResourceNotFoundExcepiton e) {
+			e.printStackTrace();
+			responseDTO.setServiceResult(e.getMessage());
+			responseDTO.setMessage(e.getMessage());
+			responseDTO.setSuccess(Boolean.FALSE);
+			return new ResponseEntity<>(responseDTO, HttpStatusCode.valueOf(404));
+		} catch (Exception e) {
+			e.printStackTrace();
+			responseDTO.setServiceResult("Failed to send password reset link");
+			responseDTO.setMessage("Failed to send password reset link");
+			responseDTO.setSuccess(Boolean.FALSE);
+
+			return new ResponseEntity<>(responseDTO, HttpStatusCode.valueOf(500));
+		}
+
+		System.out.println("Exiting from AuthController -> requestResetPassword");
+		return ResponseEntity.ok(responseDTO);
+	}
+
+	@PostMapping("/reset-password")
+	public ResponseEntity<ResponseDTO> resetPassword(@RequestParam(required = true) String token, @RequestParam(required = true) String newPassword) {
+		System.out.println("Entering into AuthController -> resetPassword");
+
+		ResponseDTO responseDTO = new ResponseDTO();
+
+		try {
+			authService.resetPassword(token, newPassword);
+			responseDTO.setServiceResult("Password reset successfully");
+			responseDTO.setMessage("Password reset successfully");
+			responseDTO.setSuccess(Boolean.TRUE);
+        } catch (ResourceNotFoundExcepiton e) {
+			e.printStackTrace();
+			responseDTO.setServiceResult(e.getMessage());
+			responseDTO.setMessage(e.getMessage());
+			responseDTO.setSuccess(Boolean.FALSE);
+			return new ResponseEntity<>(responseDTO, HttpStatusCode.valueOf(404));
+		} catch (Exception e) {
+			e.printStackTrace();
+			responseDTO.setServiceResult("Failed to reset password");
+			responseDTO.setMessage("Failed to reset password");
+			responseDTO.setSuccess(Boolean.FALSE);
+
+			return new ResponseEntity<>(responseDTO, HttpStatusCode.valueOf(500));
+		}
+
+		System.out.println("Exiting from AuthController -> resetPassword");
+		return ResponseEntity.ok(responseDTO);
+	}
 }
