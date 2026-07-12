@@ -74,6 +74,15 @@ public class UserService {
             UserDTO dto = new UserDTO();
             org.springframework.beans.BeanUtils.copyProperties(u, dto);
             dto.setPassword(null); // Don't expose password
+            // Populate driver-specific fields if user is a driver
+            if (com.TransitOps.util.Role.ROLE_DRIVER.equals(u.getRole())) {
+                Driver driver = driverDAO.findByUserAndActive(u, true);
+                if (driver != null) {
+                    dto.setDriverStatus(driver.getStatus());
+                    dto.setSafetyScore(driver.getSafetyScore());
+                    dto.setDriverID(driver.getDriverID());
+                }
+            }
             return dto;
         }).collect(java.util.stream.Collectors.toList());
     }
