@@ -1,7 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Plus, X, AlertTriangle } from "lucide-react";
 import Navbar from "../components/Navbar";
 import useAuthStore from "../store/AuthStore";
+import useDriverStore from "../store/DriverStore";
 
 // ---------------------------------------------------------------------------
 // Same dark-console tokens as Navbar / VehicleRegistry / LoginPage, kept
@@ -52,7 +53,10 @@ const STATUS_OPTIONS = ["Available", "On Trip", "Off Duty", "Suspended"];
 
 // Treat an "MM/YYYY" expiry as expired once we're past the end of that month
 function isExpired(expiry) {
-  const [mm, yyyy] = expiry.split("/").map(Number);
+  if (!expiry || typeof expiry !== "string") return false;
+  const parts = expiry.split("/").map(Number);
+  if (!parts || parts.length < 2) return false;
+  const [mm, yyyy] = parts;
   if (!mm || !yyyy) return false;
   const endOfMonth = new Date(yyyy, mm, 0, 23, 59, 59);
   return endOfMonth < new Date();
@@ -308,10 +312,11 @@ function AddDriverModal({ onSave, onCancel }) {
 // ---------------------------------------------------------------------------
 export default function DriverSafetyProfiles() {
   const { signup } = useAuthStore();
-  const [drivers, setDrivers] = useState([]);
+  const drivers = useDriverStore((state) => state.drivers);
   const [showModal, setShowModal] = useState(false);
   const [navSearch, setNavSearch] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+  const fetchDrivers = useDriverStore((state) => state.fetchDrivers);
 
   const filtered = useMemo(() => {
     const q = navSearch.trim().toLowerCase();
@@ -323,7 +328,7 @@ export default function DriverSafetyProfiles() {
     );
   }, [drivers, navSearch]);
 
-  const selectedDriver = drivers.find((d) => d.id === selectedId);
+  const selectedDriver = drivers.find((d) => (d.id ?? d.driverID ?? d.driverId) === selectedId);
 
   const handleSaveDriver = async (newDriver) => {
       const [month, year] = newDriver.expiry.split("/");
@@ -355,38 +360,19 @@ export default function DriverSafetyProfiles() {
   });
 
   if (result.success) {
-    setDrivers((prev) => {
-      const id =
-        prev.length > 0
-          ? Math.max(...prev.map((d) => d.id)) + 1
-          : 1;
-
-      const updatedDrivers = [
-        ...prev,
-        {
-          id,
-          name: newDriver.name,
-          license: newDriver.license,
-          expiry: newDriver.expiry,
-          contact: newDriver.contact,
-          trips: Number(newDriver.trips) || 0,
-          safety: 100,
-          status: "Available",
-        },
-      ];
-
-      if (!selectedId) {
-        setSelectedId(id);
-      }
-
-      return updatedDrivers;
-    });
-
+    // Refresh drivers from the store so UI reflects backend state
+    await fetchDrivers();
     setShowModal(false);
   } else {
     alert(result.message);
   }
 };
+
+useEffect(() => {
+  // fetch once on mount
+  fetchDrivers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
   const applyStatus = (status) => {
     if (!selectedId) return;
@@ -516,14 +502,14 @@ export default function DriverSafetyProfiles() {
                         className="px-8 py-4 font-mono text-xs"
                         style={{ color: c.textSecondary }}
                       >
-                        {d.license}
+                        {d.licenseNo}
                       </td>
                       <td className="px-8 py-4">
                         <span
                           className="inline-flex items-center gap-1.5"
                           style={{ color: expired ? c.rose : c.textSecondary }}
                         >
-                          {d.expiry}
+                          {d.licenseExpiryDate}
                           {expired && (
                             <span
                               className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded"
@@ -541,19 +527,19 @@ export default function DriverSafetyProfiles() {
                         className="px-8 py-4 font-mono text-xs"
                         style={{ color: c.textSecondary }}
                       >
-                        {d.contact}
+                        {d.phoneNo}
                       </td>
                       <td
                         className="px-8 py-4 font-mono text-xs"
                         style={{ color: c.textSecondary }}
                       >
-                        {d.trips}%
+                        {d.trips ?? '-'}
                       </td>
                       <td
                         className="px-8 py-4 font-mono text-xs font-semibold"
                         style={{ color: c.teal }}
                       >
-                        {d.safety}%
+                        {d.safetyScore}
                       </td>
                       <td className="px-8 py-4">
                         <StatusBadge status={d.status} />

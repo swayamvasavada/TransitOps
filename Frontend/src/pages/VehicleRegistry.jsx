@@ -682,7 +682,7 @@ export default function VehicleRegistry() {
                         className="px-8 py-4"
                         style={{ color: c.textSecondary }}
                       >
-                        {v.capacity}
+                        {v.maxLoadCapacity}
                       </td>
                       <td
                         className="px-8 py-4 font-mono text-xs"
