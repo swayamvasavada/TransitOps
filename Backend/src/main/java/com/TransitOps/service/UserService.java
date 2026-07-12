@@ -61,4 +61,28 @@ public class UserService {
 
         authService.sendVerificationMail(user.getEmail());
     }
+
+    public java.util.List<UserDTO> getUsers(String roleStr) {
+        java.util.List<User> users;
+        if (roleStr != null && !roleStr.isEmpty()) {
+            com.TransitOps.util.Role role = com.TransitOps.util.Role.valueOf(roleStr.toUpperCase());
+            users = userDAO.findByRoleAndActive(role, true);
+        } else {
+            users = userDAO.findByActive(true);
+        }
+        return users.stream().map(u -> {
+            UserDTO dto = new UserDTO();
+            org.springframework.beans.BeanUtils.copyProperties(u, dto);
+            dto.setPassword(null); // Don't expose password
+            return dto;
+        }).collect(java.util.stream.Collectors.toList());
+    }
+
+    public void updateDriverStatus(Long id, String statusStr) throws Exception {
+        Driver driver = driverDAO.findByDriverIDAndActive(id, true);
+        if (driver == null) throw new com.TransitOps.exception.ResourceNotFoundExcepiton("Driver not found!");
+        driver.setStatus(com.TransitOps.util.DriverStatus.valueOf(statusStr.toUpperCase()));
+        driver.setUpdatedAt(new Date());
+        driverDAO.save(driver);
+    }
 }

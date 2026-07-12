@@ -7,5 +7,7 @@ import java.util.List;
 
 @Repository
 public interface TripDAO extends JpaRepository<Trip, Long> {
-    List<Trip> findByStatus(com.TransitOps.util.TripStatus status);
+    List<Trip> findByStatusAndActive(com.TransitOps.util.TripStatus status, Boolean active);
+    List<Trip> findByActive(Boolean active);
+    java.util.Optional<Trip> findByTripIDAndActive(Long tripID, Boolean active);
 }

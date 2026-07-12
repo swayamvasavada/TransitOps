@@ -61,6 +61,9 @@ public class Trip {
     @Column(name = "Status")
     private TripStatus status;
 
+    @Column(name = "Active")
+    private Boolean active;
+
     @Column(name = "CreatedAt")
     private Date createdAt;
 

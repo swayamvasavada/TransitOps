@@ -46,6 +46,7 @@ public class TripService {
         trip.setVehicle(vehicle);
         trip.setDriver(driver);
         trip.setStatus(TripStatus.DRAFT);
+        trip.setActive(true);
         trip.setCreatedAt(new Date());
         trip.setUpdatedAt(new Date());
 
@@ -54,7 +55,7 @@ public class TripService {
 
     @Transactional
     public void dispatchTrip(Long tripId) throws Exception {
-        Trip trip = tripDAO.findById(tripId).orElseThrow(() -> new ResourceNotFoundExcepiton("Trip not found!"));
+        Trip trip = tripDAO.findByTripIDAndActive(tripId, true).orElseThrow(() -> new ResourceNotFoundExcepiton("Trip not found!"));
         
         if (trip.getStatus() != TripStatus.DRAFT) {
             throw new Exception("Only DRAFT trips can be dispatched.");
@@ -98,7 +99,7 @@ public class TripService {
 
     @Transactional
     public void completeTrip(Long tripId, Double finalOdometer, Double fuelConsumed) throws Exception {
-        Trip trip = tripDAO.findById(tripId).orElseThrow(() -> new ResourceNotFoundExcepiton("Trip not found!"));
+        Trip trip = tripDAO.findByTripIDAndActive(tripId, true).orElseThrow(() -> new ResourceNotFoundExcepiton("Trip not found!"));
         
         if (trip.getStatus() != TripStatus.DISPATCHED) {
             throw new Exception("Only DISPATCHED trips can be completed.");
@@ -131,7 +132,7 @@ public class TripService {
 
     @Transactional
     public void cancelTrip(Long tripId, Double finalOdometer, Double fuelConsumed) throws Exception {
-        Trip trip = tripDAO.findById(tripId).orElseThrow(() -> new ResourceNotFoundExcepiton("Trip not found!"));
+        Trip trip = tripDAO.findByTripIDAndActive(tripId, true).orElseThrow(() -> new ResourceNotFoundExcepiton("Trip not found!"));
         
         if (trip.getStatus() == TripStatus.COMPLETED || trip.getStatus() == TripStatus.CANCELLED) {
             throw new Exception("Trip is already completed or cancelled.");
@@ -169,7 +170,7 @@ public class TripService {
     }
 
     public List<TripDTO> getTrips(TripStatus status) {
-        List<Trip> trips = status == null ? tripDAO.findAll() : tripDAO.findByStatus(status);
+        List<Trip> trips = status == null ? tripDAO.findByActive(true) : tripDAO.findByStatusAndActive(status, true);
         return trips.stream().map(trip -> {
             TripDTO dto = new TripDTO();
             BeanUtils.copyProperties(trip, dto);

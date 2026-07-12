@@ -43,4 +43,43 @@ public class UserController {
         System.out.println("Exiting from UserController -> createUser");
         return ResponseEntity.ok(responseDTO);
     }
+
+    @org.springframework.web.bind.annotation.GetMapping
+    public ResponseEntity<ResponseDTO> getUsers(@org.springframework.web.bind.annotation.RequestParam(required = false) String role) {
+        ResponseDTO responseDTO = new ResponseDTO();
+        try {
+            java.util.List<UserDTO> users = userService.getUsers(role);
+            responseDTO.setServiceResult(users);
+            responseDTO.setMessage("Users retrieved successfully");
+            responseDTO.setSuccess(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseDTO.setServiceResult(e.getMessage());
+            responseDTO.setMessage("Failed to retrieve users");
+            responseDTO.setSuccess(false);
+            return ResponseEntity.internalServerError().body(responseDTO);
+        }
+        return ResponseEntity.ok(responseDTO);
+    }
+
+    @PreAuthorize("hasAnyRole('MANAGER', 'DISPATCHER')")
+    @org.springframework.web.bind.annotation.PutMapping("/updateDriverStatus")
+    public ResponseEntity<ResponseDTO> updateDriverStatus(
+            @org.springframework.web.bind.annotation.RequestParam Long id, 
+            @org.springframework.web.bind.annotation.RequestParam String status) {
+        ResponseDTO responseDTO = new ResponseDTO();
+        try {
+            userService.updateDriverStatus(id, status);
+            responseDTO.setServiceResult("Driver status updated successfully");
+            responseDTO.setMessage("Driver status updated successfully");
+            responseDTO.setSuccess(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseDTO.setServiceResult(e.getMessage());
+            responseDTO.setMessage("Failed to update driver status");
+            responseDTO.setSuccess(false);
+            return ResponseEntity.internalServerError().body(responseDTO);
+        }
+        return ResponseEntity.ok(responseDTO);
+    }
 }
