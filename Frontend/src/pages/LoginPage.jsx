@@ -14,6 +14,8 @@ import {
   AlertTriangle,
   CircleCheck,
 } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import useAuthStore from "../store/AuthStore";
 
 // ---------------------------------------------------------------------------
 // Design tokens — a dispatch-console palette: near-black chassis, signal-amber
@@ -43,10 +45,46 @@ const c = {
 };
 
 const ROLES = [
-  { name: "Fleet Manager", code: "FM-01", color: c.amber, icon: Truck, desc: "Vehicles & route oversight" },
-  { name: "Dispatcher", code: "DP-02", color: c.teal, icon: Radio, desc: "Live dispatch & routing" },
-  { name: "Safety Officer", code: "SO-03", color: c.rose, icon: ShieldCheck, desc: "Incidents & compliance" },
-  { name: "Financial Analyst", code: "FA-04", color: c.violet, icon: LineChart, desc: "Costs & billing" },
+  {
+    name: "Fleet Manager",
+    value: "ROLE_MANAGER",
+    code: "FM-01",
+    color: c.amber,
+    icon: Truck,
+    desc: "Vehicles & route oversight",
+  },
+  {
+    name: "Dispatcher",
+    value: "ROLE_DISPATCHER",
+    code: "DP-02",
+    color: c.teal,
+    icon: Radio,
+    desc: "Live dispatch & routing",
+  },
+  {
+    name: "Safety Officer",
+    value: "ROLE_SAFETY_OFFICER",
+    code: "SO-03",
+    color: c.rose,
+    icon: ShieldCheck,
+    desc: "Incidents & compliance",
+  },
+  {
+    name: "Financial Analyst",
+    value: "ROLE_FINANCIAL_ANALYST",
+    code: "FA-04",
+    color: c.violet,
+    icon: LineChart,
+    desc: "Costs & billing",
+  },
+  {
+    name: "Driver",
+    value: "ROLE_DRIVER",
+    code: "DR-05",
+    color: "#22c55e",
+    icon: Truck,
+    desc: "Driver operations",
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -193,36 +231,89 @@ function RoleSelect({ value, onChange }) {
 // Login page
 // ---------------------------------------------------------------------------
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState("Dispatcher");
+  const [role, setRole] = useState("Fleet Manager");
   const [remember, setRemember] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-
+  const { login, requestResetPassword, loading, resetUserPassword } = useAuthStore();
+  const [forgotPassword, setForgotPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const { token } = useParams();
+  const isResetPassword = !!token;
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
-      setError("Invalid credentials. Account locked after 5 failed attempts.");
+    if (isResetPassword) {
+
+      if (!newPassword) {
+        setError("Please enter new password");
+        return;
+      }
+
+      const response = await resetUserPassword(
+        token,
+        newPassword
+      );
+
+      if (response.success) {
+        alert("Password changed successfully");
+
+        navigate("/");
+      } else {
+        setError(response.message);
+      }
+
       return;
     }
+    if (forgotPassword) {
+      if (!email) {
+        setError("Please enter your email");
+        return;
+      }
+
+      const response = await requestResetPassword(email);
+
+      if (response.success) {
+        setForgotPassword(false); // Back to login page
+        alert("Password reset link sent successfully.");
+      } else {
+        setError(response.message);
+      }
+
+      return;
+    }
+
+    if (!email || !password) {
+      setError("Please enter email and password");
+      return;
+    }
+
     setError("");
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess(true);
-      // In the real app, replace this with navigate("/dashboard")
-      setTimeout(() => setSuccess(false), 2200);
-    }, 1300);
+    const selectedRole = ROLES.find((r) => r.name === role);
+    try {
+      const response = await login(email, password, selectedRole?.value);
+
+      if (response.success) {
+        setSuccess(true);
+
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 700);
+      } else {
+        setError(response.message);
+      }
+    } catch (err) {
+      setError("Something went wrong");
+    }
   };
 
   const activeRole = ROLES.find((r) => r.name === role) ?? ROLES[0];
-
   return (
     <div
       className="min-h-screen w-full flex flex-col md:flex-row relative overflow-hidden"
@@ -367,10 +458,18 @@ export default function LoginPage() {
               className="text-2xl font-semibold tracking-tight"
               style={{ color: c.textPrimary, fontFamily: "'Space Grotesk', sans-serif" }}
             >
-              Sign in
+              {isResetPassword
+                ? "Create New Password"
+                : forgotPassword
+                  ? "Forgot Password"
+                  : "Sign In"}
             </h2>
             <p className="text-sm mt-1.5" style={{ color: c.textSecondary }}>
-              Enter your credentials to reach the console
+              {isResetPassword
+                ? "Enter your new password"
+                : forgotPassword
+                  ? "Enter your email"
+                  : "Enter your credentials to reach the console"}
             </p>
           </div>
 
@@ -394,117 +493,170 @@ export default function LoginPage() {
           ) : (
             <form onSubmit={handleLogin} className="space-y-4" noValidate>
               {/* EMAIL */}
-              <div>
-                <label
-                  className="block text-[11px] font-semibold uppercase mb-2"
-                  style={{ color: c.textMuted, letterSpacing: "0.12em" }}
-                >
-                  Email
-                </label>
-                <div className="relative">
-                  <Mail
-                    size={16}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2"
-                    style={{ color: emailFocused ? c.amber : c.textMuted }}
-                  />
-                  <input
-                    type="email"
-                    placeholder="raven.k@transitops.in"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    onFocus={() => setEmailFocused(true)}
-                    onBlur={() => setEmailFocused(false)}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none transition-all duration-150"
-                    style={{
-                      background: c.panel,
-                      color: c.textPrimary,
-                      border: emailFocused ? `1px solid ${c.amber}` : `1px solid ${c.border}`,
-                      boxShadow: emailFocused ? `0 0 0 3px ${c.amber}22` : "inset 0 1px 2px rgba(0,0,0,0.4)",
-                    }}
-                  />
+              {!isResetPassword && (
+                <div>
+                  <label
+                    className="block text-[11px] font-semibold uppercase mb-2"
+                    style={{ color: c.textMuted, letterSpacing: "0.12em" }}
+                  >
+                    Email
+                  </label>
+                  <div className="relative">
+                    <Mail
+                      size={16}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2"
+                      style={{ color: emailFocused ? c.amber : c.textMuted }}
+                    />
+                    <input
+                      type="email"
+                      placeholder="raven.k@transitops.in"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      onFocus={() => setEmailFocused(true)}
+                      onBlur={() => setEmailFocused(false)}
+                      className="w-full pl-10 pr-4 py-3 rounded-xl text-sm outline-none transition-all duration-150"
+                      style={{
+                        background: c.panel,
+                        color: c.textPrimary,
+                        border: emailFocused ? `1px solid ${c.amber}` : `1px solid ${c.border}`,
+                        boxShadow: emailFocused ? `0 0 0 3px ${c.amber}22` : "inset 0 1px 2px rgba(0,0,0,0.4)",
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
+              )}
+              {isResetPassword && (
+                <div>
+                  <label
+                    className="block text-[11px] font-semibold uppercase mb-2"
+                    style={{ color: c.textMuted, letterSpacing: "0.12em" }}
+                  >
+                    New Password
+                  </label>
+
+                  <div className="relative">
+                    <Lock
+                      size={16}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2"
+                      style={{ color: passwordFocused ? c.amber : c.textMuted }}
+                    />
+
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter New Password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      onFocus={() => setPasswordFocused(true)}
+                      onBlur={() => setPasswordFocused(false)}
+                      className="w-full pl-10 pr-11 py-3 rounded-xl text-sm outline-none"
+                      style={{
+                        background: c.panel,
+                        color: c.textPrimary,
+                        border: `1px solid ${c.border}`,
+                      }}
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2"
+                    >
+                      {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* PASSWORD */}
-              <div>
-                <label
-                  className="block text-[11px] font-semibold uppercase mb-2"
-                  style={{ color: c.textMuted, letterSpacing: "0.12em" }}
-                >
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock
-                    size={16}
-                    className="absolute left-3.5 top-1/2 -translate-y-1/2"
-                    style={{ color: passwordFocused ? c.amber : c.textMuted }}
-                  />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    onFocus={() => setPasswordFocused(true)}
-                    onBlur={() => setPasswordFocused(false)}
-                    className="w-full pl-10 pr-11 py-3 rounded-xl text-sm outline-none transition-all duration-150"
-                    style={{
-                      background: c.panel,
-                      color: c.textPrimary,
-                      border: passwordFocused ? `1px solid ${c.amber}` : `1px solid ${c.border}`,
-                      boxShadow: passwordFocused ? `0 0 0 3px ${c.amber}22` : "inset 0 1px 2px rgba(0,0,0,0.4)",
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((s) => !s)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer"
-                    style={{ color: c.textMuted }}
+              {!forgotPassword && !isResetPassword && (
+                <div>
+                  <label
+                    className="block text-[11px] font-semibold uppercase mb-2"
+                    style={{ color: c.textMuted, letterSpacing: "0.12em" }}
                   >
-                    {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-                  </button>
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Lock
+                      size={16}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2"
+                      style={{ color: passwordFocused ? c.amber : c.textMuted }}
+                    />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onFocus={() => setPasswordFocused(true)}
+                      onBlur={() => setPasswordFocused(false)}
+                      className="w-full pl-10 pr-11 py-3 rounded-xl text-sm outline-none transition-all duration-150"
+                      style={{
+                        background: c.panel,
+                        color: c.textPrimary,
+                        border: passwordFocused ? `1px solid ${c.amber}` : `1px solid ${c.border}`,
+                        boxShadow: passwordFocused ? `0 0 0 3px ${c.amber}22` : "inset 0 1px 2px rgba(0,0,0,0.4)",
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((s) => !s)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer"
+                      style={{ color: c.textMuted }}
+                    >
+                      {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* ROLE (custom dropdown) */}
-              <div>
-                <label
-                  className="block text-[11px] font-semibold uppercase mb-2"
-                  style={{ color: c.textMuted, letterSpacing: "0.12em" }}
-                >
-                  Role · RBAC
-                </label>
-                <RoleSelect value={role} onChange={setRole} />
-              </div>
+              {!forgotPassword && !isResetPassword &&(
+                <div>
+                  <label
+                    className="block text-[11px] font-semibold uppercase mb-2"
+                    style={{ color: c.textMuted, letterSpacing: "0.12em" }}
+                  >
+                    Role · RBAC
+                  </label>
+
+                  <RoleSelect value={role} onChange={setRole} />
+                </div>
+              )}
 
               {/* REMEMBER + FORGOT */}
-              <div className="flex items-center justify-between pt-1">
-                <label
-                  className="flex items-center gap-2 text-xs cursor-pointer select-none"
-                  onClick={() => setRemember((r) => !r)}
-                  style={{ color: c.textSecondary }}
-                >
-                  <div
-                    className="w-4 h-4 rounded flex items-center justify-center transition-all duration-150"
-                    style={{
-                      background: remember ? c.amberSoft : c.panel,
-                      border: remember ? `1px solid ${c.amber}` : `1px solid ${c.border}`,
-                    }}
+              {!forgotPassword && !isResetPassword && (
+                <div className="flex items-center justify-between pt-1">
+                  <label
+                    className="flex items-center gap-2 text-xs cursor-pointer select-none"
+                    onClick={() => setRemember((r) => !r)}
+                    style={{ color: c.textSecondary }}
                   >
-                    {remember && <Check size={11} style={{ color: c.amber }} strokeWidth={3} />}
-                  </div>
-                  Remember me
-                </label>
+                    <div
+                      className="w-4 h-4 rounded flex items-center justify-center transition-all duration-150"
+                      style={{
+                        background: remember ? c.amberSoft : c.panel,
+                        border: remember ? `1px solid ${c.amber}` : `1px solid ${c.border}`,
+                      }}
+                    >
+                      {remember && <Check size={11} style={{ color: c.amber }} strokeWidth={3} />}
+                    </div>
+                    Remember me
+                  </label>
 
-                <button
-                  type="button"
-                  className="text-xs bg-transparent border-none cursor-pointer font-medium"
-                  style={{ color: c.amber }}
-                >
-                  Forgot password?
-                </button>
-              </div>
-
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForgotPassword(true);
+                      setError("");
+                    }}
+                    className="text-xs bg-transparent border-none cursor-pointer font-medium"
+                    style={{ color: c.amber }}
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
               {/* SUBMIT */}
               <button
                 type="submit"
@@ -523,7 +675,11 @@ export default function LoginPage() {
                     Signing in…
                   </>
                 ) : (
-                  "Sign in"
+                      isResetPassword
+                        ? "Reset Password"
+                        : forgotPassword
+                          ? "Submit"
+                          : "Sign In"
                 )}
               </button>
 
