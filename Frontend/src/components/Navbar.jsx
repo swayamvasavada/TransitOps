@@ -33,12 +33,14 @@ const ROLE_COLORS = {
 };
 
 function getInitials(name = "") {
-  return name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase())
-    .join("") || "U";
+  return (
+    name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase())
+      .join("") || "U"
+  );
 }
 
 export default function Navbar({
@@ -106,8 +108,12 @@ export default function Navbar({
   return (
     <div className="w-full">
       <nav
-        className="fixed top-0 left-0 w-full px-6 py-3 flex items-center gap-4 z-50 border-b"
-        style={{ backgroundColor: c.bg, borderColor: c.borderSoft, backdropFilter: "saturate(120%) blur(6px)" }}
+        className="fixed top-0 left-0 w-full px-6 py-3 flex items-center gap-4 z-50 border-b justify-between"
+        style={{
+          backgroundColor: c.bg,
+          borderColor: c.borderSoft,
+          backdropFilter: "saturate(120%) blur(6px)",
+        }}
       >
         {/* Left — menu toggle + brand */}
         <div className="flex items-center gap-3 shrink-0">
@@ -116,60 +122,62 @@ export default function Navbar({
             className="p-2 rounded-md transition cursor-pointer"
             style={{ color: c.textSecondary }}
             onMouseEnter={(e) => (e.currentTarget.style.background = c.surface)}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.background = "transparent")
+            }
             aria-label={isOpen ? "Close menu" : "Open menu"}
           >
             {isOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
 
-          <h1
+          {/* <h1
             className="hidden sm:block text-lg font-bold tracking-tight"
             style={{ color: c.textPrimary, fontFamily: "'Space Grotesk', sans-serif" }}
           >
             TransitOps
-          </h1>
-        </div>
+          </h1> */}
 
-        {/* Center — search */}
-        <div className="flex-1 max-w-md">
-          <div className="relative">
-            <Search
-              size={16}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
-              style={{ color: c.textMuted }}
-            />
-            <input
-              type="text"
-              value={query}
-              onChange={handleSearchChange}
-              onKeyDown={handleSearchKeyDown}
-              placeholder={searchPlaceholder}
-              className="w-full pl-9 pr-8 py-2 rounded-lg text-sm outline-none transition-all duration-150"
-              style={{
-                background: c.surface,
-                color: c.textPrimary,
-                border: `1px solid ${c.border}`,
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.border = `1px solid ${c.amber}`;
-                e.currentTarget.style.boxShadow = `0 0 0 3px ${c.amber}22`;
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.border = `1px solid ${c.border}`;
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            />
-            {query && (
-              <button
-                type="button"
-                onClick={clearSearch}
-                aria-label="Clear search"
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded cursor-pointer"
+          {/* Center — search */}
+          <div className="flex-1 max-w-md">
+            <div className="relative">
+              <Search
+                size={16}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
                 style={{ color: c.textMuted }}
-              >
-                <X size={14} />
-              </button>
-            )}
+              />
+              <input
+                type="text"
+                value={query}
+                onChange={handleSearchChange}
+                onKeyDown={handleSearchKeyDown}
+                placeholder={searchPlaceholder}
+                className="w-full pl-9 pr-8 py-2 rounded-lg text-sm outline-none transition-all duration-150"
+                style={{
+                  background: c.surface,
+                  color: c.textPrimary,
+                  border: `1px solid ${c.border}`,
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.border = `1px solid ${c.amber}`;
+                  e.currentTarget.style.boxShadow = `0 0 0 3px ${c.amber}22`;
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.border = `1px solid ${c.border}`;
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={clearSearch}
+                  aria-label="Clear search"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded cursor-pointer"
+                  style={{ color: c.textMuted }}
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -233,7 +241,10 @@ export default function Navbar({
                 animation: "navFadeIn 150ms ease-out",
               }}
             >
-              <div className="px-4 py-3 flex items-center gap-3 border-b" style={{ borderColor: c.borderSoft }}>
+              <div
+                className="px-4 py-3 flex items-center gap-3 border-b"
+                style={{ borderColor: c.borderSoft }}
+              >
                 <span
                   className="flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold shrink-0"
                   style={{ color: c.bg, background: roleColor }}
@@ -241,16 +252,25 @@ export default function Navbar({
                   {initials}
                 </span>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold truncate" style={{ color: c.textPrimary }}>
+                  <p
+                    className="text-sm font-semibold truncate"
+                    style={{ color: c.textPrimary }}
+                  >
                     {userName}
                   </p>
-                  <p className="text-xs truncate" style={{ color: c.textMuted }}>
+                  <p
+                    className="text-xs truncate"
+                    style={{ color: c.textMuted }}
+                  >
                     {userEmail}
                   </p>
                 </div>
               </div>
 
-              <div className="px-4 py-2.5 flex items-center gap-2 text-xs" style={{ color: c.textSecondary }}>
+              <div
+                className="px-4 py-2.5 flex items-center gap-2 text-xs"
+                style={{ color: c.textSecondary }}
+              >
                 <User size={13} style={{ color: roleColor }} />
                 Role: <span style={{ color: roleColor }}>{userRole}</span>
               </div>
@@ -259,8 +279,12 @@ export default function Navbar({
                 onClick={handleLogout}
                 className="w-full flex items-center gap-2 text-left px-4 py-3 text-sm transition cursor-pointer border-t"
                 style={{ color: c.error, borderColor: c.borderSoft }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(251,100,116,0.08)")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background = "rgba(251,100,116,0.08)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = "transparent")
+                }
               >
                 <LogOut size={14} />
                 Logout
