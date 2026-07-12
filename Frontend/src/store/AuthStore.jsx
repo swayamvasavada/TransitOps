@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
-import { Login } from "../api/apiPath";
+import { Login , requestemail  } from "../api/apiPath";
 
 const useAuthStore = create((set) => ({
   loading: false,
@@ -8,7 +8,7 @@ const useAuthStore = create((set) => ({
   token: localStorage.getItem("token") || null,
   error: null,
 
-  login: async (email, password) => {
+  login: async (email, password,role) => {
     try {
       set({
         loading: true,
@@ -18,6 +18,7 @@ const useAuthStore = create((set) => ({
       const response = await axios.post(Login, {
         email,
         password,
+        role,
       });
 
       const data = response.data;
@@ -60,6 +61,41 @@ const useAuthStore = create((set) => ({
       error: null,
     });
   },
+
+  requestResetPassword: async (email) => {
+  try {
+    set({
+      loading: true,
+      error: null,
+    });
+
+    const response = await axios.get(requestemail, {
+      params: {
+        email,
+      },
+    });
+
+    set({
+      loading: false,
+    });
+
+    return {
+      success: true,
+      data: response.data,
+    };
+  } catch (error) {
+    set({
+      loading: false,
+      error: error.response?.data?.message || "Something went wrong",
+    });
+
+    return {
+      success: false,
+      message:
+        error.response?.data?.message || "Something went wrong",
+    };
+  }
+},
 }));
 
 export default useAuthStore;

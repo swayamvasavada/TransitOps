@@ -45,10 +45,46 @@ const c = {
 };
 
 const ROLES = [
-  { name: "Fleet Manager", code: "FM-01", color: c.amber, icon: Truck, desc: "Vehicles & route oversight" },
-  { name: "Dispatcher", code: "DP-02", color: c.teal, icon: Radio, desc: "Live dispatch & routing" },
-  { name: "Safety Officer", code: "SO-03", color: c.rose, icon: ShieldCheck, desc: "Incidents & compliance" },
-  { name: "Financial Analyst", code: "FA-04", color: c.violet, icon: LineChart, desc: "Costs & billing" },
+  {
+    name: "Fleet Manager",
+    value: "ROLE_MANAGER",
+    code: "FM-01",
+    color: c.amber,
+    icon: Truck,
+    desc: "Vehicles & route oversight",
+  },
+  {
+    name: "Dispatcher",
+    value: "ROLE_DISPATCHER",
+    code: "DP-02",
+    color: c.teal,
+    icon: Radio,
+    desc: "Live dispatch & routing",
+  },
+  {
+    name: "Safety Officer",
+    value: "ROLE_SAFETY_OFFICER",
+    code: "SO-03",
+    color: c.rose,
+    icon: ShieldCheck,
+    desc: "Incidents & compliance",
+  },
+  {
+    name: "Financial Analyst",
+    value: "ROLE_FINANCIAL_ANALYST",
+    code: "FA-04",
+    color: c.violet,
+    icon: LineChart,
+    desc: "Costs & billing",
+  },
+  {
+    name: "Driver",
+    value: "ROLE_DRIVER",
+    code: "DR-05",
+    color: "#22c55e",
+    icon: Truck,
+    desc: "Driver operations",
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -199,17 +235,36 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState("Dispatcher");
+  const [role, setRole] = useState("Fleet Manager");
   const [remember, setRemember] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-   const { login, loading } = useAuthStore();
-
+  const { login, requestResetPassword, loading } = useAuthStore();
+  const [forgotPassword, setForgotPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+ 
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (forgotPassword) {
+      if (!email) {
+        setError("Please enter your email");
+        return;
+      }
+
+      const response = await requestResetPassword(email);
+
+      if (response.success) {
+        setForgotPassword(false); // Back to login page
+        alert("Password reset link sent successfully.");
+      } else {
+        setError(response.message);
+      }
+
+      return;
+    }
 
     if (!email || !password) {
       setError("Please enter email and password");
@@ -217,9 +272,9 @@ export default function LoginPage() {
     }
 
     setError("");
-
+    const selectedRole = ROLES.find((r) => r.name === role);
     try {
-      const response = await login(email, password);
+      const response = await login(email, password,  selectedRole?.value);
 
       if (response.success) {
         setSuccess(true);
@@ -236,7 +291,6 @@ export default function LoginPage() {
   };
 
   const activeRole = ROLES.find((r) => r.name === role) ?? ROLES[0];
-
   return (
     <div
       className="min-h-screen w-full flex flex-col md:flex-row relative overflow-hidden"
@@ -381,10 +435,12 @@ export default function LoginPage() {
               className="text-2xl font-semibold tracking-tight"
               style={{ color: c.textPrimary, fontFamily: "'Space Grotesk', sans-serif" }}
             >
-              Sign in
+            {forgotPassword ? "Reset Password" : "Sign in"}
             </h2>
             <p className="text-sm mt-1.5" style={{ color: c.textSecondary }}>
-              Enter your credentials to reach the console
+              {forgotPassword
+                ? "Enter your new password"
+                : "Enter your credentials to reach the console"}
             </p>
           </div>
 
@@ -440,6 +496,7 @@ export default function LoginPage() {
               </div>
 
               {/* PASSWORD */}
+              {!forgotPassword && (
               <div>
                 <label
                   className="block text-[11px] font-semibold uppercase mb-2"
@@ -479,19 +536,24 @@ export default function LoginPage() {
                   </button>
                 </div>
               </div>
+              )}
 
               {/* ROLE (custom dropdown) */}
-              <div>
-                <label
-                  className="block text-[11px] font-semibold uppercase mb-2"
-                  style={{ color: c.textMuted, letterSpacing: "0.12em" }}
-                >
-                  Role · RBAC
-                </label>
-                <RoleSelect value={role} onChange={setRole} />
-              </div>
+                {!forgotPassword && (
+                  <div>
+                    <label
+                      className="block text-[11px] font-semibold uppercase mb-2"
+                      style={{ color: c.textMuted, letterSpacing: "0.12em" }}
+                    >
+                      Role · RBAC
+                    </label>
+
+                    <RoleSelect value={role} onChange={setRole} />
+                  </div>
+                )}
 
               {/* REMEMBER + FORGOT */}
+              {!forgotPassword && (
               <div className="flex items-center justify-between pt-1">
                 <label
                   className="flex items-center gap-2 text-xs cursor-pointer select-none"
@@ -510,15 +572,19 @@ export default function LoginPage() {
                   Remember me
                 </label>
 
-                <button
-                  type="button"
-                  className="text-xs bg-transparent border-none cursor-pointer font-medium"
-                  style={{ color: c.amber }}
-                >
-                  Forgot password?
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForgotPassword(true);
+                      setError("");
+                    }}
+                    className="text-xs bg-transparent border-none cursor-pointer font-medium"
+                    style={{ color: c.amber }}
+                  >
+                    Forgot Password?
+                  </button>
               </div>
-
+              )}
               {/* SUBMIT */}
               <button
                 type="submit"
@@ -537,7 +603,7 @@ export default function LoginPage() {
                     Signing in…
                   </>
                 ) : (
-                  "Sign in"
+                 forgotPassword ? "Submit" : "Sign In"
                 )}
               </button>
 
