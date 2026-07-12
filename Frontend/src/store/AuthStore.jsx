@@ -2,10 +2,13 @@ import { create } from "zustand";
 import axios from "axios";
 import { Login, requestemail, resetPassword } from "../api/apiPath";
 
+const storedToken = localStorage.getItem("token");
+const storedUser = localStorage.getItem("user");
+
 const useAuthStore = create((set) => ({
     loading: false,
-    user: null,
-    token: localStorage.getItem("token") || null,
+    user: storedUser ? JSON.parse(storedUser) : null,
+    token: storedToken,
     error: null,
 
     login: async (email, password, role) => {
@@ -37,6 +40,8 @@ const useAuthStore = create((set) => ({
 
             localStorage.setItem("token", data.serviceResult.token);
             localStorage.setItem("user", JSON.stringify(data.serviceResult));
+            console.log( ">>>>>>>>>>>",localStorage.getItem("token", data.serviceResult.token));
+            
 
             set({
                 loading: false,
@@ -64,6 +69,7 @@ const useAuthStore = create((set) => ({
 
     logout: () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("user");
 
         set({
             user: null,
