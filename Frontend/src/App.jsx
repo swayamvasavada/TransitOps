@@ -13,7 +13,7 @@ import Dashboard from "./pages/Dashboard";
 // import TripandExpScreen from "./pages/TripandExpScreen";
 // import Performance from "./pages/Performance";
 // import Analytics from "./pages/Analytics";
-// import VehicleRegistry from "./pages/VehicleRegistry";
+import VehicleRegistry from "./pages/VehicleRegistry";
 // import SignUp from "./pages/SignUp";
 
 function AppContent() {
@@ -24,8 +24,8 @@ function AppContent() {
         <Route path="/" element={<LoginPage />} />
         {/* <Route path="/signup" element={<SignUp />} /> */}
         <Route path="/dashboard" element={<Dashboard />} />
-        {/* <Route path="/vehicle-registry" element={<VehicleRegistry />} />
-        <Route path="/trip-dispatcher" element={<TripDispatchPage />} />
+        <Route path="/vehicle-registry" element={<VehicleRegistry />} />
+        {/* <Route path="/trip-dispatcher" element={<TripDispatchPage />} />
         <Route path="/maintenance" element={<Maintenance />} />
         <Route path="/trip-expense" element={<TripandExpScreen />} />
         <Route path="/performance" element={<Performance />} />
