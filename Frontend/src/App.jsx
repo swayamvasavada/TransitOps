@@ -24,6 +24,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         {/* <Route path="/signup" element={<SignUp />} /> */}
+        <Route path="/reset-password/:token" element={<LoginPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/vehicle-registry" element={<VehicleRegistry />} />
         <Route path="/drivers" element={<Drivers />} />
