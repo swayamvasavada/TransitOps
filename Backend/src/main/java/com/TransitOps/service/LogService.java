@@ -148,22 +148,12 @@ public class LogService {
         }).collect(Collectors.toList());
     }
 
-    public ExpenseSummaryDTO getExpenseSummary(Long vehicleID, Long tripID) {
-        // Fetch fuel logs
-        List<FuelLogDTO> fuelLogs = getFuelLogs(vehicleID, tripID);
+    public ExpenseSummaryDTO getExpenseSummary() {
+        // Fetch all active fuel logs
+        List<FuelLogDTO> fuelLogs = getFuelLogs(null, null);
 
-        // Fetch all expense logs for the filter
-        List<ExpenseLog> rawExpenses;
-        if (vehicleID != null) {
-            rawExpenses = expenseLogDAO.findByVehicle_VehicleIDAndActive(vehicleID, true);
-        } else if (tripID != null) {
-            rawExpenses = expenseLogDAO.findByTrip_TripIDAndActive(tripID, true);
-        } else {
-            rawExpenses = expenseLogDAO.findByActive(true);
-        }
-
-        // Exclude FUEL category — that's already covered by fuelLogs
-        List<ExpenseLogDTO> expenseLogs = rawExpenses.stream()
+        // Single expense list: TOLL + OTHER + MAINTENANCE (all non-FUEL)
+        List<ExpenseLogDTO> expenseLogs = expenseLogDAO.findByActive(true).stream()
                 .filter(log -> log.getCategory() != ExpenseCategory.FUEL)
                 .map(log -> {
                     ExpenseLogDTO dto = new ExpenseLogDTO();
@@ -173,7 +163,6 @@ public class LogService {
                     return dto;
                 }).collect(Collectors.toList());
 
-        // Calculate totals
         double totalFuelCost = fuelLogs.stream()
                 .mapToDouble(f -> f.getTotalCost() != null ? f.getTotalCost() : 0.0).sum();
         double totalOtherExpenses = expenseLogs.stream()

@@ -115,13 +115,11 @@ public class LogController {
     }
 
     @GetMapping("/summary")
-    public ResponseEntity<ResponseDTO> getExpenseSummary(
-            @RequestParam(required = false) Long vehicleID,
-            @RequestParam(required = false) Long tripID) {
+    public ResponseEntity<ResponseDTO> getExpenseSummary() {
         System.out.println("Entering into LogController -> getExpenseSummary");
         ResponseDTO responseDTO = new ResponseDTO();
         try {
-            ExpenseSummaryDTO summary = logService.getExpenseSummary(vehicleID, tripID);
+            ExpenseSummaryDTO summary = logService.getExpenseSummary();
             responseDTO.setServiceResult(summary);
             responseDTO.setMessage("Expense summary retrieved successfully");
             responseDTO.setSuccess(true);
