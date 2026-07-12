@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { Plus, X, AlertTriangle } from "lucide-react";
 import Navbar from "../components/Navbar";
+import useAuthStore from "../store/AuthStore";
 
 // ---------------------------------------------------------------------------
 // Same dark-console tokens as Navbar / VehicleRegistry / LoginPage, kept
@@ -48,54 +49,6 @@ const STATUS_STYLES = {
 };
 
 const STATUS_OPTIONS = ["Available", "On Trip", "Off Duty", "Suspended"];
-const CATEGORIES = ["LMV", "HMV"];
-
-const initialDrivers = [
-  {
-    id: 1,
-    name: "Alex",
-    license: "DL-88213",
-    category: "LMV",
-    expiry: "12/2028",
-    contact: "98765xxxxx",
-    trips: 96,
-    safety: "Available",
-    status: "Available",
-  },
-  {
-    id: 2,
-    name: "John",
-    license: "DL-44120",
-    category: "HMV",
-    expiry: "03/2025",
-    contact: "98220xxxx",
-    trips: 81,
-    safety: "Suspended",
-    status: "Suspended",
-  },
-  {
-    id: 3,
-    name: "Priya",
-    license: "DL-77031",
-    category: "LMV",
-    expiry: "08/2027",
-    contact: "99110xxxxx",
-    trips: 99,
-    safety: "On Trip",
-    status: "On Trip",
-  },
-  {
-    id: 4,
-    name: "Suresh",
-    license: "DL-90045",
-    category: "HMV",
-    expiry: "01/2027",
-    contact: "97440xxxx",
-    trips: 88,
-    safety: "Available",
-    status: "Off Duty",
-  },
-];
 
 // Treat an "MM/YYYY" expiry as expired once we're past the end of that month
 function isExpired(expiry) {
@@ -128,11 +81,10 @@ function AddDriverModal({ onSave, onCancel }) {
   const [form, setForm] = useState({
     name: "",
     license: "",
-    category: "LMV",
     expiry: "",
     contact: "",
     trips: "",
-    safety: "Available",
+    safety: 100, // Explicitly default safety to 100 on initial creation
     status: "Available",
   });
 
@@ -148,7 +100,7 @@ function AddDriverModal({ onSave, onCancel }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.name || !form.license) return;
-    onSave({ ...form, trips: Number(form.trips) || 0 });
+    onSave({ ...form, trips: Number(form.trips) || 0, safety: Number(form.safety) || 100 });
   };
 
   return (
@@ -234,26 +186,6 @@ function AddDriverModal({ onSave, onCancel }) {
                 className="block text-[11px] font-semibold uppercase mb-1.5"
                 style={{ color: c.textMuted }}
               >
-                Category
-              </label>
-              <select
-                value={form.category}
-                onChange={update("category")}
-                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-                style={{ ...inputStyle, colorScheme: "dark" }}
-              >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label
-                className="block text-[11px] font-semibold uppercase mb-1.5"
-                style={{ color: c.textMuted }}
-              >
                 Expiry (MM/YYYY)
               </label>
               <input
@@ -309,20 +241,18 @@ function AddDriverModal({ onSave, onCancel }) {
                 className="block text-[11px] font-semibold uppercase mb-1.5"
                 style={{ color: c.textMuted }}
               >
-                Safety
+                Safety (%)
               </label>
-              <select
+              <input
+                type="number"
+                min="0"
+                max="100"
                 value={form.safety}
                 onChange={update("safety")}
+                placeholder="100"
                 className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-                style={{ ...inputStyle, colorScheme: "dark" }}
-              >
-                {STATUS_OPTIONS.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
+                style={inputStyle}
+              />
             </div>
             <div>
               <label
@@ -377,30 +307,86 @@ function AddDriverModal({ onSave, onCancel }) {
 // Page
 // ---------------------------------------------------------------------------
 export default function DriverSafetyProfiles() {
-  const [drivers, setDrivers] = useState(initialDrivers);
+  const { signup } = useAuthStore();
+  const [drivers, setDrivers] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [navSearch, setNavSearch] = useState("");
-  const [selectedId, setSelectedId] = useState(initialDrivers[0]?.id ?? null);
+  const [selectedId, setSelectedId] = useState(null);
 
   const filtered = useMemo(() => {
     const q = navSearch.trim().toLowerCase();
     if (!q) return drivers;
     return drivers.filter((d) =>
-      [d.name, d.license, d.category, d.contact, d.status].some((f) =>
-        f.toLowerCase().includes(q),
+      [d.name, d.license, d.contact, d.status].some((f) =>
+        f?.toLowerCase().includes(q),
       ),
     );
   }, [drivers, navSearch]);
 
   const selectedDriver = drivers.find((d) => d.id === selectedId);
 
-  const handleSaveDriver = (newDriver) => {
+  const handleSaveDriver = async (newDriver) => {
+      const [month, year] = newDriver.expiry.split("/");
+
+  const licenseExpiryDate = new Date(
+    Number(year),
+    Number(month) - 1,
+    1
+  ).toISOString();
+  const result = await signup({
+    name: newDriver.name,
+
+    // Replace with actual email/password fields if you add them to the form
+    email: `${newDriver.name.toLowerCase().replace(/\s+/g, "")}@fleet.com`,
+    password: "DriverPassword123!",
+
+    phoneNo: newDriver.contact,
+    licenseNo: newDriver.license,
+
+    // If your backend expects ISO date, convert accordingly
+    licenseExpiryDate: licenseExpiryDate,
+
+    role: "ROLE_DRIVER",
+
+    // Extra fields only for Add Driver
+    driverStatus: "AVAILABLE",
+    safetyScore: 100,
+    driverID: null,
+  });
+
+  if (result.success) {
     setDrivers((prev) => {
-      const id = prev.length ? Math.max(...prev.map((d) => d.id)) + 1 : 1;
-      return [...prev, { id, ...newDriver }];
+      const id =
+        prev.length > 0
+          ? Math.max(...prev.map((d) => d.id)) + 1
+          : 1;
+
+      const updatedDrivers = [
+        ...prev,
+        {
+          id,
+          name: newDriver.name,
+          license: newDriver.license,
+          expiry: newDriver.expiry,
+          contact: newDriver.contact,
+          trips: Number(newDriver.trips) || 0,
+          safety: 100,
+          status: "Available",
+        },
+      ];
+
+      if (!selectedId) {
+        setSelectedId(id);
+      }
+
+      return updatedDrivers;
     });
+
     setShowModal(false);
-  };
+  } else {
+    alert(result.message);
+  }
+};
 
   const applyStatus = (status) => {
     if (!selectedId) return;
@@ -469,7 +455,6 @@ export default function DriverSafetyProfiles() {
                   {[
                     "Driver",
                     "License No",
-                    "Category",
                     "Expiry",
                     "Contact",
                     "Trip Compl.",
@@ -489,7 +474,7 @@ export default function DriverSafetyProfiles() {
                 {filtered.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={8}
+                      colSpan={7}
                       className="text-center py-16 text-sm"
                       style={{ color: c.textMuted }}
                     >
@@ -533,12 +518,6 @@ export default function DriverSafetyProfiles() {
                       >
                         {d.license}
                       </td>
-                      <td
-                        className="px-8 py-4"
-                        style={{ color: c.textSecondary }}
-                      >
-                        {d.category}
-                      </td>
                       <td className="px-8 py-4">
                         <span
                           className="inline-flex items-center gap-1.5"
@@ -570,8 +549,11 @@ export default function DriverSafetyProfiles() {
                       >
                         {d.trips}%
                       </td>
-                      <td className="px-8 py-4">
-                        <StatusBadge status={d.safety} />
+                      <td
+                        className="px-8 py-4 font-mono text-xs font-semibold"
+                        style={{ color: c.teal }}
+                      >
+                        {d.safety}%
                       </td>
                       <td className="px-8 py-4">
                         <StatusBadge status={d.status} />

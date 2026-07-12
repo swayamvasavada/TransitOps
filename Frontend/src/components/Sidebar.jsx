@@ -29,7 +29,7 @@ export default function Sidebar({ isOpen, onLogout }) {
   { label: "Drivers", path: "/drivers", icon: User },
   { label: "Trip Dispatcher", path: "/trip-dispatcher", icon: Navigation },
   { label: "Maintenance", path: "/maintenance", icon: Wrench },
-  { label: "Trip & Expense", path: "/trip-expense", icon: DollarSign },
+  { label: "Fuel & Expense", path: "/fuel-expense", icon: DollarSign },
   // { label: "Performance", path: "/performance", icon: TrendingUp },
   { label: "Analytics", path: "/analytics", icon: PieChart },
   { label: "Settings", path: "/settings", icon: Settings },

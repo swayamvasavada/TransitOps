@@ -36,7 +36,7 @@ function AppContent() {
         <Route path="/drivers" element={<Drivers />} />
         <Route path="/trip-dispatcher" element={<TripDispatchPage />} />
         <Route path="/maintenance" element={<Maintenance />} />
-        <Route path="/trip-expense" element={<TripandExpScreen />} />
+        <Route path="/fuel-expense" element={<TripandExpScreen />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/analytics" element={<Analytics />} />
       </Routes>

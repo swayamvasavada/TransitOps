@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import axios from "axios";
-import { Login, requestemail, resetPassword } from "../api/apiPath";
+import { Login, requestemail, resetPassword, Signup } from "../api/apiPath";
 
 const storedToken = localStorage.getItem("token");
 const storedUser = localStorage.getItem("user");
@@ -184,80 +184,121 @@ const useAuthStore = create((set) => ({
     }
   },
   // ================= SIGNUP =================
-  signup: async ({
-    name,
-    email,
-    password,
-    phoneNo,
-    licenseNo,
-    licenseExpiryDate,
-    role,
-  }) => {
-    try {
-      set({
-        loading: true,
-        error: null,
-      });
+  // ================= SIGNUP =================
+// ================= SIGNUP =================
+signup: async ({
+  name,
+  email,
+  password,
+  phoneNo,
+  licenseNo,
+  licenseExpiryDate,
+  role,
+  driverStatus,
+  safetyScore,
+  driverID,
+}) => {
+  try {
+    set({
+      loading: true,
+      error: null,
+    });
 
-      const response = await axios.post(Signup, {
-        name,
-        email,
-        password,
-        phoneNo,
-        licenseNo,
-        licenseExpiryDate,
-        role,
-      });
+    const payload = {
+      name,
+      email,
+      password,
+      phoneNo,
+      licenseNo,
+      licenseExpiryDate,
+      role,
+    };
 
-      const data = response.data || {};
+    // Extra fields only when provided
+    if (driverStatus !== undefined) {
+      payload.driverStatus = driverStatus;
+    }
 
-      // Extract token like in login
-      const extractToken = (resp) => {
-        const d = resp?.data || {};
-        if (d?.token) return d.token;
-        if (d?.accessToken) return d.accessToken;
-        if (d?.data?.token) return d.data.token;
-        if (resp?.headers?.authorization) {
-          const parts = resp.headers.authorization.split(" ");
-          return parts.length === 2 ? parts[1] : resp.headers.authorization;
-        }
-        return null;
-      };
+    if (safetyScore !== undefined) {
+      payload.safetyScore = safetyScore;
+    }
 
-      const token =
-        extractToken(response) || data.token || data.accessToken || null;
+    if (driverID !== undefined) {
+      payload.driverID = driverID;
+    }
 
-      if (token) {
-        try {
-          localStorage.setItem("token", token);
-        } catch (e) {
-          // ignore
-        }
+    const authToken = localStorage.getItem("token");
+
+    const response = await axios.post(
+      Signup,
+      payload,
+      {
+        headers: authToken
+          ? {
+              Authorization: `Bearer ${authToken}`,
+            }
+          : {},
+      }
+    );
+
+    const data = response.data || {};
+
+    // Extract token from response (if signup returns one)
+    const extractToken = (resp) => {
+      const d = resp?.data || {};
+
+      if (d?.token) return d.token;
+      if (d?.accessToken) return d.accessToken;
+      if (d?.data?.token) return d.data.token;
+
+      if (resp?.headers?.authorization) {
+        const parts = resp.headers.authorization.split(" ");
+        return parts.length === 2
+          ? parts[1]
+          : resp.headers.authorization;
       }
 
-      set({
-        loading: false,
-        user: data.user || null,
-        token: token || null,
-        error: null,
-      });
+      return null;
+    };
 
-      return {
-        success: true,
-        data,
-      };
-    } catch (error) {
-      set({
-        loading: false,
-        error: error.response?.data?.message || "Signup failed",
-      });
+    const newToken =
+      extractToken(response) ||
+      data.token ||
+      data.accessToken ||
+      null;
 
-      return {
-        success: false,
-        message: error.response?.data?.message || "Signup failed",
-      };
+    if (newToken) {
+      localStorage.setItem("token", newToken);
     }
-  },
+
+    set({
+      loading: false,
+      user: data.user || null,
+      token: newToken || authToken,
+      error: null,
+    });
+
+    return {
+      success: true,
+      data,
+    };
+  } catch (error) {
+    console.log("Signup Error:", error);
+    console.log("Response:", error.response);
+    console.log("Data:", error.response?.data);
+
+    set({
+      loading: false,
+      error: error.response?.data?.message || error.message,
+    });
+
+    return {
+      success: false,
+      message: error.response?.data?.message || error.message,
+    };
+  }
+},
+
 }));
 
 export default useAuthStore;
