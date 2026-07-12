@@ -13,10 +13,7 @@ client.interceptors.request.use(
       const token = localStorage.getItem("token");
       if (token) {
         config.headers = config.headers || {};
-        // Common header formats some backends expect
         config.headers["Authorization"] = `Bearer ${token}`;
-        config.headers["x-access-token"] = token;
-        config.headers["token"] = token;
         // Debug: show that we're attaching a token (masked)
         try {
           const masked = token ? `${token.slice(0, 6)}...${token.slice(-4)}` : null;

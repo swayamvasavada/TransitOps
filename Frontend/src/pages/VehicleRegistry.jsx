@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { ChevronDown, Check, Plus, X, Trash2, Edit } from "lucide-react";
 import Navbar from "../components/Navbar";
-import useVehicleStore from "../store/vehicleStore";
+import useVehicleStore from "../store/VehicleStore";
 
 // ---------------------------------------------------------------------------
 // Palette — same dark-console tokens as Navbar/LoginPage. Kept local so this
@@ -194,10 +194,18 @@ function AddVehicleModal({ onSave, onCancel, loading, error, initialData }) {
         reg: initialData.registrationNumber || initialData.reg || "",
         name: initialData.name || "",
         type: initialData.type || "Van",
-        capacity: initialData.maxLoadCapacity ? String(initialData.maxLoadCapacity) : initialData.capacity || "",
+        capacity: initialData.maxLoadCapacity
+          ? String(initialData.maxLoadCapacity)
+          : initialData.capacity || "",
         odometer: initialData.odometer ? String(initialData.odometer) : "",
-        cost: initialData.acquisitionCost ? String(initialData.acquisitionCost) : initialData.cost || "",
-        status: initialData.status ? (typeof initialData.status === 'string' ? initialData.status.replace(/_/g, ' ') : initialData.status) : "Available",
+        cost: initialData.acquisitionCost
+          ? String(initialData.acquisitionCost)
+          : initialData.cost || "",
+        status: initialData.status
+          ? typeof initialData.status === "string"
+            ? initialData.status.replace(/_/g, " ")
+            : initialData.status
+          : "Available",
       });
     }
   }, [initialData]);
@@ -244,7 +252,7 @@ function AddVehicleModal({ onSave, onCancel, loading, error, initialData }) {
               className="font-bold text-base"
               style={{ color: c.textPrimary }}
             >
-              New Vehicle Registration
+             {initialData ? "Update Vehicle" : "New Vehicle Registration"}
             </h2>
             <p className="text-xs mt-0.5" style={{ color: c.textMuted }}>
               Fill in vehicle details below
@@ -419,7 +427,11 @@ function AddVehicleModal({ onSave, onCancel, loading, error, initialData }) {
               className="flex-1 py-2.5 rounded-lg text-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
               style={{ background: c.amber, color: "#1a1200" }}
             >
-              {loading ? "Registering..." : initialData ? "Update Vehicle" : "Save Vehicle"}
+              {loading
+                ? "Registering..."
+                : initialData
+                  ? "Update Vehicle"
+                  : "Save Vehicle"}
             </button>
           </div>
         </form>
@@ -438,8 +450,15 @@ export default function VehicleRegistry() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [regSearch, setRegSearch] = useState("");
   const [navSearch, setNavSearch] = useState("");
-  const { registerVehicle, loading, error, vehicles, getVehicles, deleteVehicle } =
-    useVehicleStore();
+  const {
+    registerVehicle,
+    loading,
+    error,
+    vehicles,
+    getVehicles,
+    deleteVehicle,
+    updateVehicle,
+  } = useVehicleStore();
   const [editingVehicle, setEditingVehicle] = useState(null);
 
   const typeOptions = useMemo(
@@ -451,24 +470,30 @@ export default function VehicleRegistry() {
   }, [getVehicles]);
 
   const handleSaveVehicle = async (newVehicle) => {
-    const vehicleID = editingVehicle ? editingVehicle.vehicleID : 0;
-    const result = await registerVehicle({
-      vehicleID,
-      registrationNumber: newVehicle.reg,
-      name: newVehicle.name,
-      type: newVehicle.type,
-      maxLoadCapacity: Number(newVehicle.capacity),
-      odometer: Number(newVehicle.odometer),
-      acquisitionCost: Number(newVehicle.cost),
-      status: newVehicle.status.toUpperCase().replace(/\s+/g, "_"),
-    });
-
-    if (result.success) {
-      await getVehicles(); // Refresh the table
-      setShowModal(false);
-      setEditingVehicle(null);
-    }
+  const payload = {
+    registrationNumber: newVehicle.reg,
+    name: newVehicle.name,
+    type: newVehicle.type,
+    maxLoadCapacity: Number(newVehicle.capacity),
+    odometer: Number(newVehicle.odometer),
+    acquisitionCost: Number(newVehicle.cost),
+    status: newVehicle.status.toUpperCase().replace(/\s+/g, "_"),
   };
+
+  let result;
+
+  if (editingVehicle) {
+    result = await updateVehicle(editingVehicle?.vehicleID, payload);
+  } else {
+    result = await registerVehicle(payload);
+  }
+
+  if (result.success) {
+    await getVehicles();
+    setShowModal(false);
+    setEditingVehicle(null);
+  }
+};
 
   const handleDelete = async (vehicleID) => {
     const result = await deleteVehicle(vehicleID);
@@ -489,8 +514,14 @@ export default function VehicleRegistry() {
     const regVal = (v.reg || v.registrationNumber || "").toString();
     const matchesReg = regVal.toLowerCase().includes(regSearch.toLowerCase());
     const q = navSearch.trim().toLowerCase();
-    const navFields = [regVal, v.name || v.vehicleName || "", v.type || "", v.status || ""];
-    const matchesNav = !q || navFields.some((f) => f.toString().toLowerCase().includes(q));
+    const navFields = [
+      regVal,
+      v.name || v.vehicleName || "",
+      v.type || "",
+      v.status || "",
+    ];
+    const matchesNav =
+      !q || navFields.some((f) => f.toString().toLowerCase().includes(q));
     return matchesType && matchesStatus && matchesReg && matchesNav;
   });
 
@@ -663,7 +694,7 @@ export default function VehicleRegistry() {
                         className="px-8 py-4 font-mono text-xs"
                         style={{ color: c.textSecondary }}
                       >
-                        {inr(v.cost)}
+                        {inr(v.acquisitionCost)}
                       </td>
                       <td className="px-8 py-4">
                         <div className="flex items-center gap-2">

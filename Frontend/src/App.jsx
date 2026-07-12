@@ -16,11 +16,15 @@ import TripandExpScreen from "./pages/TripandExpScreen";
 import Settings from "./pages/Settings";
 import Analytics from "./pages/Analytics";
 import VehicleRegistry from "./pages/VehicleRegistry";
+import Loader from "./components/Loader";
+import useGlobalLoading from "./hooks/useGlobalLoading";
 // import SignUp from "./pages/SignUp";
 
 function AppContent() {
+  const globalLoading = useGlobalLoading();
   return (
     <>
+      <Loader show={globalLoading} text="Please wait" />
       {/* <div className="flex min-h-screen"> */}
       <Routes>
         <Route path="/" element={<LoginPage />} />

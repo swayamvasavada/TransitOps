@@ -1,6 +1,11 @@
 import { create } from "zustand";
 import axios from "../api/axiosClient";
-import { RegisterVehicle, GetVehicles, DeleteVehicle } from "../api/apiPath";
+import {
+  RegisterVehicle,
+  GetVehicles,
+  DeleteVehicle,
+  UpdateVehicle,
+} from "../api/apiPath";
 
 const useVehicleStore = create((set) => ({
   loading: false,
@@ -68,9 +73,19 @@ const useVehicleStore = create((set) => ({
 
       const response = await axios.get(GetVehicles);
 
+      const data = response.data;
+
+      // Normalize different response shapes into an array for `vehicles`.
+      let list = [];
+      if (Array.isArray(data)) list = data;
+      else if (Array.isArray(data?.serviceResult)) list = data.serviceResult;
+      else if (Array.isArray(data?.data)) list = data.data;
+      else if (Array.isArray(data?.vehicles)) list = data.vehicles;
+      else list = [];
+
       set({
         loading: false,
-        vehicles: response.data,
+        vehicles: list,
       });
 
       return {
@@ -90,7 +105,7 @@ const useVehicleStore = create((set) => ({
     }
   },
   // ================= DELETE VEHICLE =================
-  deleteVehicle: async (vehicleID) => {
+  deleteVehicle: async (id) => {
     try {
       set({
         loading: true,
@@ -99,15 +114,13 @@ const useVehicleStore = create((set) => ({
 
       await axios.delete(DeleteVehicle, {
         params: {
-          vehicleID,
+          id,
         },
       });
 
       set((state) => ({
         loading: false,
-        vehicles: state.vehicles.filter(
-          (vehicle) => vehicle.vehicleID !== vehicleID,
-        ),
+        vehicles: state.vehicles.filter((vehicle) => vehicle.vehicleID !== id),
       }));
 
       return {
@@ -128,7 +141,7 @@ const useVehicleStore = create((set) => ({
 
   // ================= UPDATE VEHICLE =================
   updateVehicle: async (
-    vehicleID,
+    id,
     {
       registrationNumber,
       name,
@@ -145,8 +158,7 @@ const useVehicleStore = create((set) => ({
         error: null,
       });
 
-      const response = await axios.put(`${UpdateVehicle}/${vehicleID}`, {
-        vehicleID,
+      const payload = {
         registrationNumber,
         name,
         type,
@@ -154,6 +166,10 @@ const useVehicleStore = create((set) => ({
         odometer,
         acquisitionCost,
         status,
+      };
+
+      const response = await axios.put(UpdateVehicle, payload, {
+        params: { id },
       });
 
       const data = response.data;
@@ -161,7 +177,7 @@ const useVehicleStore = create((set) => ({
       set((state) => ({
         loading: false,
         vehicles: state.vehicles.map((vehicle) =>
-          vehicle.vehicleID === vehicleID ? data : vehicle,
+          vehicle.vehicleID === id ? data : vehicle,
         ),
         error: null,
       }));
