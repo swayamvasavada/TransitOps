@@ -35,6 +35,8 @@ export default function ScreenWrapper({ children, title }: ScreenWrapperProps) {
     { label: "Drivers Profiles", screen: "Drivers", icon: "👥" },
     { label: "Trip Dispatcher", screen: "Dispatch", icon: "📋" },
     { label: "Trip Expenses", screen: "Expenses", icon: "💰" },
+    { label: "Team Chat", screen: "TeamChat", icon: "💬" },
+    { label: "AI Assistant", screen: "Chat", icon: "🤖" },
     { label: "Settings", screen: "Settings", icon: "⚙️" },
   ];
 

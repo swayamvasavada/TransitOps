@@ -14,6 +14,9 @@ import DriverProfileScreen from "../screens/DriverProfileScreen";
 import TripDispatchScreen from "../screens/TripDispatchScreen";
 import ExpenseScreen from "../screens/ExpenseScreen";
 import SettingsScreen from "../screens/SettingsScreen";
+import ChatScreen from "../screens/ChatScreen";
+import TeamChatScreen from "../screens/TeamChatScreen";
+import ChatRoomScreen from "../screens/ChatRoomScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -47,6 +50,9 @@ export default function AppNavigator() {
         <Stack.Screen name="Dispatch" component={TripDispatchScreen} />
         <Stack.Screen name="Expenses" component={ExpenseScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="Chat" component={ChatScreen} />
+        <Stack.Screen name="TeamChat" component={TeamChatScreen} />
+        <Stack.Screen name="ChatRoom" component={ChatRoomScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
