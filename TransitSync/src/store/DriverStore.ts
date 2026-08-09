@@ -24,7 +24,7 @@ const useDriverStore = create<DriverState>((set, get) => ({
 
       const response = await axios.get(GetDrivers, { params: { role: "ROLE_DRIVER" } });
       const data = response.data;
-      
+
       let list = [];
       if (Array.isArray(data)) list = data;
       else if (Array.isArray(data?.serviceResult)) list = data.serviceResult;

@@ -74,7 +74,7 @@ export default function ScreenWrapper({ children, title }: ScreenWrapperProps) {
           <View style={styles.sidebarContainer}>
             <SafeAreaView style={styles.sidebarSafeArea}>
               <View style={styles.sidebarHeader}>
-                <Text style={styles.logoText}>Transit<Text style={styles.logoAccent}>Ops</Text></Text>
+                <Text style={styles.logoText}>Transit<Text style={styles.logoAccent}>Sync</Text></Text>
                 <Text style={styles.logoSubtitle}>Dispatch Console</Text>
               </View>
 

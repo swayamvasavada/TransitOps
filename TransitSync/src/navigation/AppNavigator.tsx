@@ -8,6 +8,7 @@ import Loader from "../components/Loader";
 import LoginScreen from "../screens/LoginScreen";
 import SignupScreen from "../screens/SignupScreen";
 import DashboardScreen from "../screens/DashboardScreen";
+import AttendanceScreen from "../screens/AttendanceScreen";
 import VehicleRegistryScreen from "../screens/VehicleRegistryScreen";
 import DriverProfileScreen from "../screens/DriverProfileScreen";
 import TripDispatchScreen from "../screens/TripDispatchScreen";
@@ -40,6 +41,7 @@ export default function AppNavigator() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="Dashboard" component={DashboardScreen} />
+        <Stack.Screen name="Attendance" component={AttendanceScreen} />
         <Stack.Screen name="Vehicles" component={VehicleRegistryScreen} />
         <Stack.Screen name="Drivers" component={DriverProfileScreen} />
         <Stack.Screen name="Dispatch" component={TripDispatchScreen} />

@@ -89,7 +89,7 @@ export default function SignupScreen() {
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.headerContainer}>
-            <Text style={styles.logoText}>Transit<Text style={styles.logoAccent}>Ops</Text></Text>
+            <Text style={styles.logoText}>Transit<Text style={styles.logoAccent}>Sync</Text></Text>
             <Text style={styles.subtitle}>Register New Account</Text>
           </View>
 

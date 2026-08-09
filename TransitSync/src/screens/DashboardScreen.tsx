@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
+import { useNavigation } from "@react-navigation/native";
 import {
   StyleSheet,
   View,
@@ -7,6 +8,7 @@ import {
   TextInput,
   RefreshControl,
   Platform,
+  TouchableOpacity,
 } from "react-native";
 import ScreenWrapper from "../components/ScreenWrapper";
 import { authColors } from "../colors/colors";
@@ -20,6 +22,7 @@ export default function DashboardScreen() {
   const { vehicles, getVehicles } = useVehicleStore();
   const { drivers, getDrivers } = useDriverStore();
   const [refreshing, setRefreshing] = useState(false);
+  const navigation = useNavigation();
 
   const loadData = async () => {
     await Promise.all([getTrips(), getVehicles(), getDrivers()]);
@@ -99,6 +102,7 @@ export default function DashboardScreen() {
     <ScreenWrapper title="Dashboard">
       <ScrollView
         style={styles.container}
+        keyboardShouldPersistTaps="handled"
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={authColors.roleAccent} />
         }
@@ -113,6 +117,10 @@ export default function DashboardScreen() {
             </View>
           ))}
         </ScrollView>
+          {/* Add Attendance Button */}
+          <TouchableOpacity style={styles.addAttendanceButton} onPress={() => navigation.navigate('Attendance')}>
+            <Text style={styles.addAttendanceButtonText}>Add Attendance</Text>
+          </TouchableOpacity>
 
         {/* Trips Search & Header */}
         <View style={styles.listHeaderContainer}>
@@ -123,6 +131,7 @@ export default function DashboardScreen() {
             placeholderTextColor={authColors.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}
+            returnKeyType="done"
           />
         </View>
 
@@ -281,6 +290,23 @@ const styles = StyleSheet.create({
   tripDetail: {
     fontSize: 12,
     color: authColors.textMuted,
+  },
+  addAttendanceButton: {
+    backgroundColor: '#28a745',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignSelf: 'center',
+    marginTop: 16,
+    marginBottom: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addAttendanceButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   emptyContainer: {
     alignItems: "center",

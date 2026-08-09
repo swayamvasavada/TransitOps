@@ -43,6 +43,20 @@ const useAuthStore = create<AuthState>((set) => ({
   },
 
   login: async (email, password, role) => {
+    // Mock login for demo without backend
+    if (email === 'test@transitsync.com' && password === 'password') {
+      // Provide mock user based on role selection
+      const roleMap: Record<string, any> = {
+        ROLE_DISPATCHER: { id: 1, name: 'Demo Dispatcher', email, role: 'ROLE_DISPATCHER' },
+        ROLE_ADMIN: { id: 2, name: 'Demo Admin', email, role: 'ROLE_ADMIN' },
+        ROLE_DRIVER: { id: 3, name: 'Demo Driver', email, role: 'ROLE_DRIVER' },
+      };
+      const mockUser = roleMap[role] || { id: 0, name: 'Demo User', email, role };
+      await AsyncStorage.setItem('token', 'mock-token');
+      await AsyncStorage.setItem('user', JSON.stringify(mockUser));
+      set({ loading: false, user: mockUser, token: 'mock-token', error: null });
+      return { success: true, data: mockUser };
+    }
     try {
       set({ loading: true, error: null });
 
@@ -128,6 +142,14 @@ const useAuthStore = create<AuthState>((set) => ({
     safetyScore,
     driverID,
   }) => {
+    // Mock signup for demo without backend
+    if (email === 'test@transitsync.com' && password === 'password') {
+      const mockUser = { id: 99, name, email, role };
+      await AsyncStorage.setItem('token', 'mock-token');
+      await AsyncStorage.setItem('user', JSON.stringify(mockUser));
+      set({ loading: false, user: mockUser, token: 'mock-token', error: null });
+      return { success: true, data: { user: mockUser, token: 'mock-token' } };
+    }
     try {
       set({ loading: true, error: null });
 
