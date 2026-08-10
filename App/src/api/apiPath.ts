@@ -1,0 +1,16 @@
+export const BASE_URL = 'https://zr2c07nm-5000.inc1.devtunnels.ms';
+
+export const Login = `${BASE_URL}/api/auth/login`;
+export const requestemail = `${BASE_URL}/api/auth/request-reset-password`;
+export const resetPassword = `${BASE_URL}/api/auth/reset-password`;
+export const Signup = `${BASE_URL}/api/user/create`;
+export const RegisterVehicle = 'http://localhost:5173/api/vehicle/create';
+export const GetVehicles = 'http://localhost:5173/api/vehicle/';
+export const DeleteVehicle = 'http://localhost:5173/api/vehicle/delete/';
+export const UpdateVehicle = 'http://localhost:5173/api/vehicle/update/';
+export const RegisterTrip = 'http://localhost:5173/api/trip/create';
+export const GetTrips = 'http://localhost:5173/api/trip';
+export const DispatchTrip = `${BASE_URL}/api/trip/dispatch`;
+export const CompleteTrip = `${BASE_URL}/api/trip/complete`;
+export const CancelTrip = `${BASE_URL}/api/trip/cancel`;
+export const GetDrivers = `${BASE_URL}/api/user`;
