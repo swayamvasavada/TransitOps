@@ -5,6 +5,7 @@ import MainTabsNavigator from './MainTabsNavigator';
 import SettingsScreen from '../screens/SettingsScreen';
 import useAuthStore from '../store/AuthStore';
 import {colors} from '../theme/colors';
+import { User } from 'lucide-react-native';
 
 const Drawer = createDrawerNavigator();
 
@@ -28,16 +29,32 @@ function CustomDrawerContent(props: any) {
 }
 
 export default function MainDrawerNavigator() {
+  const user = useAuthStore(state => state.user);
+
   return (
     <Drawer.Navigator
       drawerContent={props => <CustomDrawerContent {...props} />}
-      screenOptions={{
-        headerStyle: {backgroundColor: colors.panel},
+      screenOptions={({ navigation }) => ({
+        headerStyle: { backgroundColor: colors.panel, borderBottomWidth: 0, elevation: 0, shadowOpacity: 0 },
         headerTintColor: colors.textPrimary,
-        drawerStyle: {backgroundColor: colors.panel},
+        drawerStyle: { backgroundColor: colors.panel },
         drawerActiveTintColor: colors.amber,
         drawerInactiveTintColor: colors.textSecondary,
-      }}>
+        headerLeft: () => null,
+        headerTitle: () => (
+          <Text style={{ color: colors.textPrimary, fontSize: 20, fontWeight: '700' }}>
+            Hey! {user?.name || 'User'}
+          </Text>
+        ),
+        headerRight: () => (
+          <Pressable 
+            onPress={() => navigation.navigate('Profile')}
+            style={{ marginRight: 16, width: 40, height: 40, borderRadius: 20, backgroundColor: colors.borderSoft, alignItems: 'center', justifyContent: 'center' }}
+          >
+            <User color={colors.textPrimary} size={20} />
+          </Pressable>
+        ),
+      })}>
       <Drawer.Screen name="Operations" component={MainTabsNavigator} />
       <Drawer.Screen name="Settings" component={SettingsScreen} />
     </Drawer.Navigator>

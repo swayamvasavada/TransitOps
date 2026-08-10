@@ -131,7 +131,7 @@ export default function AnalyticsScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
+  screen: { flex: 1, backgroundColor: colors.bg, paddingBottom: rf(50) },
   container: { paddingHorizontal: rf(16), paddingTop: rf(24), paddingBottom: rf(40), flexGrow: 1 },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: rf(20) },
   pageTitle: { color: colors.textPrimary, fontSize: rf(28), fontWeight: '800', letterSpacing: -1 },

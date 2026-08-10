@@ -108,7 +108,7 @@ const DriverCard = ({ driver }: { driver: any }) => {
   const displayStatus = (driver.status || driver.driverStatus || 'Available')
     .replace(/_/g, ' ')
     .replace(/\w\S*/g, (w: string) => w.replace(/^\w/, (c) => c.toUpperCase()));
-  
+
   const style = STATUS_STYLES[displayStatus] || STATUS_STYLES.Available;
   const expired = isExpired(driver.licenseExpiryDate);
 
@@ -161,7 +161,7 @@ const DriverCard = ({ driver }: { driver: any }) => {
 export default function DriversScreen() {
   const { drivers, fetchDrivers } = useDriverStore();
   const { signup } = useAuthStore();
-  
+
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
 
@@ -190,7 +190,7 @@ export default function DriversScreen() {
       const nameVal = (d.name || '').toLowerCase();
       const licenseVal = (d.licenseNo || '').toLowerCase();
       const contactVal = (d.phoneNo || '').toLowerCase();
-      
+
       return nameVal.includes(q) || licenseVal.includes(q) || contactVal.includes(q);
     });
   }, [drivers, search]);
@@ -254,7 +254,7 @@ export default function DriversScreen() {
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        
+
         {/* HEADER */}
         <View style={styles.headerRow}>
           <Text style={styles.pageTitle}>Drivers</Text>
@@ -280,9 +280,9 @@ export default function DriversScreen() {
         <View style={styles.listContainer}>
           {filteredDrivers.length > 0 ? (
             filteredDrivers.map((driver: any) => (
-              <DriverCard 
-                key={driver.driverID || driver.id || driver.name} 
-                driver={driver} 
+              <DriverCard
+                key={driver.driverID || driver.id || driver.name}
+                driver={driver}
               />
             ))
           ) : (
@@ -377,9 +377,9 @@ export default function DriversScreen() {
           <View style={styles.dropdownContainer}>
             <Text style={styles.dropdownTitle}>Select Status</Text>
             {STATUS_OPTIONS.map((opt) => (
-              <Pressable 
-                key={opt} 
-                style={styles.dropdownOption} 
+              <Pressable
+                key={opt}
+                style={styles.dropdownOption}
                 onPress={() => {
                   setFormStatus(opt);
                   setShowStatusDropdown(false);
@@ -397,7 +397,7 @@ export default function DriversScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
+  screen: { flex: 1, backgroundColor: colors.bg, paddingBottom: rf(90) },
   container: { paddingHorizontal: rf(16), paddingVertical: rf(24), paddingBottom: rf(40), flexGrow: 1 },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: rf(20) },
   pageTitle: { color: colors.textPrimary, fontSize: rf(28), fontWeight: '800', letterSpacing: -1 },
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
   addButtonText: { color: '#1a1200', fontSize: rf(14), fontWeight: '700' },
   searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: rf(12), paddingHorizontal: rf(16), height: rf(52), marginBottom: rf(20), gap: rf(10) },
   searchInput: { flex: 1, color: colors.textPrimary, fontSize: rf(15), height: '100%' },
-  
+
   listContainer: { gap: rf(12) },
   driverCard: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: rf(16), overflow: 'hidden' },
   driverCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: rf(16), paddingVertical: rf(12), backgroundColor: colors.panel, borderBottomWidth: 1, borderBottomColor: colors.borderSoft },
@@ -419,21 +419,21 @@ const styles = StyleSheet.create({
   expiryText: { fontSize: rf(13), fontWeight: '600' },
   expiredTag: { flexDirection: 'row', alignItems: 'center', gap: rf(4), backgroundColor: 'rgba(251,113,133,0.15)', paddingHorizontal: rf(6), paddingVertical: rf(2), borderRadius: rf(4) },
   expiredTagText: { color: colors.rose, fontSize: rf(10), fontWeight: '700', textTransform: 'uppercase' },
-  
+
   statusBadge: { paddingHorizontal: rf(10), paddingVertical: rf(4), borderRadius: rf(20), borderWidth: 1 },
   statusText: { fontSize: rf(12), fontWeight: '700' },
-  
+
   driverCardFooter: { flexDirection: 'row', justifyContent: 'space-between', padding: rf(16), backgroundColor: colors.panel },
   footerItem: { gap: rf(2) },
   footerLabel: { color: colors.textMuted, fontSize: rf(10), textTransform: 'uppercase', fontWeight: '700' },
   footerValue: { color: colors.textPrimary, fontSize: rf(13), fontWeight: '600' },
-  
+
   emptyState: { padding: rf(40), alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surface, borderRadius: rf(16), borderWidth: 1, borderColor: colors.borderSoft, borderStyle: 'dashed', marginTop: rf(8) },
   emptyStateIconWrapper: { width: rf(64), height: rf(64), borderRadius: rf(32), backgroundColor: colors.panel, alignItems: 'center', justifyContent: 'center', marginBottom: rf(16), borderWidth: 1, borderColor: colors.borderSoft },
   emptyStateTitle: { color: colors.textPrimary, fontSize: rf(16), fontWeight: '700', marginBottom: rf(8) },
   emptyStateText: { color: colors.textMuted, fontSize: rf(14), textAlign: 'center', lineHeight: rf(20) },
-  
-  bottomSheetOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'flex-end' },
+
+  bottomSheetOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.2)', justifyContent: 'flex-end' },
   bottomSheet: { backgroundColor: colors.surface, borderTopLeftRadius: rf(24), borderTopRightRadius: rf(24), padding: rf(15), paddingBottom: Platform.OS === 'android' ? rf(55) : rf(32), maxHeight: '90%' },
   bottomSheetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: rf(24) },
   bottomSheetTitle: { color: colors.textPrimary, fontSize: rf(20), fontWeight: '700' },
@@ -445,14 +445,14 @@ const styles = StyleSheet.create({
   formInput: { backgroundColor: colors.panel, borderWidth: 1, borderColor: colors.border, borderRadius: rf(8), paddingHorizontal: rf(12), height: rf(44), color: colors.textPrimary, fontSize: rf(14) },
   dropdownInput: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.panel, borderWidth: 1, borderColor: colors.border, borderRadius: rf(8), paddingHorizontal: rf(12), height: rf(44) },
   dropdownInputText: { color: colors.textPrimary, fontSize: rf(14) },
-  
+
   bottomSheetFooter: { flexDirection: 'row', gap: rf(20), marginTop: rf(16) },
   cancelBtn: { flex: 1, height: rf(48), backgroundColor: colors.panel, borderWidth: 1, borderColor: colors.border, borderRadius: rf(12), alignItems: 'center', justifyContent: 'center' },
   cancelBtnText: { color: colors.textSecondary, fontSize: rf(15), fontWeight: '600' },
   saveBtn: { flex: 1, height: rf(48), backgroundColor: colors.amber, borderRadius: rf(12), alignItems: 'center', justifyContent: 'center' },
   saveBtnText: { color: '#1a1200', fontSize: rf(15), fontWeight: '700' },
 
-  filterModalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'center', padding: rf(24) },
+  filterModalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.2)', justifyContent: 'center', padding: rf(24) },
   dropdownContainer: { backgroundColor: colors.surface, borderRadius: rf(16), borderWidth: 1, borderColor: colors.border, maxHeight: '60%', overflow: 'hidden', paddingVertical: rf(8) },
   dropdownTitle: { color: colors.textMuted, fontSize: rf(12), fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, paddingHorizontal: rf(20), paddingVertical: rf(12), borderBottomWidth: 1, borderBottomColor: colors.borderSoft, marginBottom: rf(8) },
   dropdownOption: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: rf(14), paddingHorizontal: rf(20) },

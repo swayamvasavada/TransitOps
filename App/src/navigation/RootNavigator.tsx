@@ -3,6 +3,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import useAuthStore from '../store/AuthStore';
 import AuthNavigator from './AuthNavigator';
 import MainDrawerNavigator from './MainDrawerNavigator';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -12,7 +13,10 @@ export default function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
       {token ? (
-        <Stack.Screen name="Main" component={MainDrawerNavigator} />
+        <Stack.Group>
+          <Stack.Screen name="Main" component={MainDrawerNavigator} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
+        </Stack.Group>
       ) : (
         <Stack.Screen name="Auth" component={AuthNavigator} />
       )}

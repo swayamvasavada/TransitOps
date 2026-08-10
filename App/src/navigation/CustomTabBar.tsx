@@ -1,0 +1,282 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+  interpolate,
+  Extrapolation,
+} from 'react-native-reanimated';
+import {
+  LayoutDashboard,
+  Truck,
+  Users,
+  Map,
+  Wrench,
+  Fuel,
+  BarChart3,
+  MoreHorizontal,
+  X,
+} from 'lucide-react-native';
+import { colors } from '../theme/colors';
+import { rf } from '../theme/responsive';
+
+const { width } = Dimensions.get('window');
+
+const getIcon = (routeName: string, color: string, size: number) => {
+  switch (routeName) {
+    case 'Dashboard':
+      return <LayoutDashboard color={color} size={size} />;
+    case 'VehicleRegistry':
+      return <Truck color={color} size={size} />;
+    case 'Drivers':
+      return <Users color={color} size={size} />;
+    case 'TripDispatcher':
+      return <Map color={color} size={size} />;
+    case 'Maintenance':
+      return <Wrench color={color} size={size} />;
+    case 'FuelExpense':
+      return <Fuel color={color} size={size} />;
+    case 'Analytics':
+      return <BarChart3 color={color} size={size} />;
+    default:
+      return <LayoutDashboard color={color} size={size} />;
+  }
+};
+
+const getLabel = (routeName: string) => {
+  switch (routeName) {
+    case 'Dashboard':
+      return 'Dashboard';
+    case 'VehicleRegistry':
+      return 'Vehicles';
+    case 'Drivers':
+      return 'Drivers';
+    case 'TripDispatcher':
+      return 'Trips';
+    case 'Maintenance':
+      return 'Maintenance';
+    case 'FuelExpense':
+      return 'Fuel';
+    case 'Analytics':
+      return 'Analytics';
+    default:
+      return routeName;
+  }
+};
+
+export default function CustomTabBar({ state, descriptors, navigation }: any) {
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const animation = useSharedValue(0);
+
+  useEffect(() => {
+    animation.value = withTiming(isMoreOpen ? 1 : 0, {
+      duration: 250,
+      easing: Easing.out(Easing.ease),
+    });
+  }, [isMoreOpen, animation]);
+
+  const animatedMenuStyle = useAnimatedStyle(() => {
+    const translateY = interpolate(animation.value, [0, 1], [30, 0], Extrapolation.CLAMP);
+    const opacity = interpolate(animation.value, [0, 1], [0, 1], Extrapolation.CLAMP);
+    const scale = interpolate(animation.value, [0, 1], [0.95, 1], Extrapolation.CLAMP);
+
+    return {
+      opacity,
+      transform: [{ translateY }, { scale }],
+      pointerEvents: isMoreOpen ? 'auto' : 'none',
+    };
+  });
+
+  const animatedOverlayStyle = useAnimatedStyle(() => {
+    return {
+      opacity: interpolate(animation.value, [0, 1], [0, 1], Extrapolation.CLAMP),
+      pointerEvents: isMoreOpen ? 'auto' : 'none',
+    };
+  });
+
+  const primaryRoutes = state.routes.slice(0, 4);
+  const secondaryRoutes = state.routes.slice(4);
+
+  // Check if active screen is in the secondary list
+  const isSecondaryActive = secondaryRoutes.some((route: any) => route.key === state.routes[state.index].key);
+
+  const handlePress = (route: any, isFocused: boolean) => {
+    if (isMoreOpen) setIsMoreOpen(false);
+
+    const event = navigation.emit({
+      type: 'tabPress',
+      target: route.key,
+      canPreventDefault: true,
+    });
+
+    if (!isFocused && !event.defaultPrevented) {
+      navigation.navigate(route.name);
+    }
+  };
+
+  return (
+    <View style={styles.wrapper} pointerEvents="box-none">
+
+      {/* Background Overlay to close menu when tapping outside */}
+      <Animated.View style={[styles.overlay, animatedOverlayStyle]}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={() => setIsMoreOpen(false)} />
+      </Animated.View>
+
+      {/* Expanded Glassmorphic Menu */}
+      <Animated.View style={[styles.expandedMenu, animatedMenuStyle]}>
+        <View style={styles.grid}>
+          {secondaryRoutes.map((route: any, index: number) => {
+            const isFocused = state.index === state.routes.findIndex((r: any) => r.key === route.key);
+            const color = isFocused ? colors.amber : colors.textPrimary;
+            const bg = isFocused ? 'rgba(245, 158, 11, 0.15)' : 'rgba(0, 0, 0, 0.03)';
+
+            return (
+              <Pressable
+                key={route.key}
+                style={[styles.gridItem, { backgroundColor: bg }]}
+                onPress={() => handlePress(route, isFocused)}>
+                <View style={[styles.iconBox, isFocused && { backgroundColor: 'transparent' }]}>
+                  {getIcon(route.name, color, 24)}
+                </View>
+                <Text style={[styles.gridItemText, { color }]}>{getLabel(route.name)}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </Animated.View>
+
+      {/* Floating Pill Bottom Tab */}
+      <View style={styles.pillContainer}>
+        {primaryRoutes.map((route: any, index: number) => {
+          const isFocused = state.index === index;
+          const color = isFocused ? colors.amber : colors.textMuted;
+
+          return (
+            <Pressable
+              key={route.key}
+              style={styles.tabItem}
+              onPress={() => handlePress(route, isFocused)}>
+              <View style={[styles.activeIndicator, { opacity: isFocused ? 1 : 0 }]} />
+              {getIcon(route.name, color, 22)}
+              <Text style={[styles.tabLabel, { color }]}>{getLabel(route.name)}</Text>
+            </Pressable>
+          );
+        })}
+
+        {/* More Button */}
+        <Pressable
+          style={styles.tabItem}
+          onPress={() => setIsMoreOpen(!isMoreOpen)}>
+          <View style={[styles.activeIndicator, { opacity: (isMoreOpen || isSecondaryActive) ? 1 : 0 }]} />
+          {isMoreOpen ? (
+            <X color={colors.amber} size={24} />
+          ) : (
+            <MoreHorizontal color={isSecondaryActive ? colors.amber : colors.textMuted} size={24} />
+          )}
+          <Text style={[styles.tabLabel, { color: (isMoreOpen || isSecondaryActive) ? colors.amber : colors.textMuted }]}>
+            More
+          </Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  wrapper: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  overlay: {
+    position: 'absolute',
+    bottom: -100,
+    left: 0,
+    right: 0,
+    height: Dimensions.get('window').height + 200,
+    width: '100%',
+  },
+  pillContainer: {
+    flexDirection: 'row',
+    backgroundColor: colors.panel,
+    width: '100%',
+    paddingBottom: rf(24), // spacing for bottom edge
+    paddingTop: 8,
+    height: 70 + rf(24),
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    elevation: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -5 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0, 0, 0, 0.05)',
+  },
+  tabItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activeIndicator: {
+    position: 'absolute',
+    top: -8,
+    width: 24,
+    height: 4,
+    backgroundColor: colors.amber,
+    borderBottomLeftRadius: 4,
+    borderBottomRightRadius: 4,
+  },
+  tabLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    marginTop: 4,
+  },
+  expandedMenu: {
+    width: width - 32,
+    backgroundColor: '#FFFFFF',
+    borderRadius: rf(24),
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.05)',
+    padding: 16,
+    marginBottom: 16, // gap between menu and pill
+    elevation: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -5 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  gridItem: {
+    width: '31%', // Fits 3 items per row with gap
+    aspectRatio: 1, // square-ish
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.04)',
+  },
+  iconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0, 0, 0, 0.03)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  gridItemText: {
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+});

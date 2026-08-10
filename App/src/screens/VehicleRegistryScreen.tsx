@@ -138,11 +138,11 @@ const FilterChip = ({ label, value, options, onChange }: any) => {
 
 const VehicleCard = ({ vehicle, onEdit, onDelete }: any) => {
   const statusRaw = vehicle.status || 'Available';
-  const displayStatus = statusRaw.includes('_') 
+  const displayStatus = statusRaw.includes('_')
     ? statusRaw.replace(/_/g, ' ').replace(/\w\S*/g, (w: string) => (w.replace(/^\w/, (c) => c.toUpperCase())))
     : statusRaw;
   const statusStyle = STATUS_STYLES[displayStatus] || STATUS_STYLES.Available;
-  
+
   const regNo = vehicle.reg || vehicle.registrationNumber || vehicle.registrationNo || 'N/A';
   const name = vehicle.name || vehicle.vehicleName || 'Unnamed';
   const cost = vehicle.acquisitionCost ? Number(vehicle.acquisitionCost).toLocaleString('en-IN') : '0';
@@ -172,7 +172,7 @@ const VehicleCard = ({ vehicle, onEdit, onDelete }: any) => {
           </Pressable>
         </View>
       </View>
-      
+
       <View style={styles.vehicleCardBody}>
         <View style={styles.vehicleMainInfo}>
           <Text style={styles.vehicleName}>{name}</Text>
@@ -208,11 +208,11 @@ const VehicleCard = ({ vehicle, onEdit, onDelete }: any) => {
 // Added a comment to trigger a Metro Bundler Fast Refresh
 export default function VehicleRegistryScreen() {
   const { vehicles, getVehicles, registerVehicle, updateVehicle, deleteVehicle, loading, error } = useVehicleStore();
-  
+
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
-  
+
   const [showModal, setShowModal] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<any>(null);
 
@@ -238,15 +238,15 @@ export default function VehicleRegistryScreen() {
     const dataSource = vehicles.length > 0 ? vehicles : MOCK_VEHICLES;
     return dataSource.filter((v: any) => {
       const displayStatus = (v.status || '').replace(/_/g, ' ').replace(/\w\S*/g, (w: string) => (w.replace(/^\w/, (c) => c.toUpperCase())));
-      
+
       const matchesType = typeFilter === 'All' || v.type === typeFilter;
       const matchesStatus = statusFilter === 'All' || displayStatus === statusFilter;
-      
+
       const q = search.trim().toLowerCase();
       const regVal = (v.reg || v.registrationNumber || v.registrationNo || '').toLowerCase();
       const nameVal = (v.name || v.vehicleName || '').toLowerCase();
       const matchesSearch = !q || regVal.includes(q) || nameVal.includes(q);
-      
+
       return matchesType && matchesStatus && matchesSearch;
     });
   }, [vehicles, search, typeFilter, statusFilter]);
@@ -319,7 +319,7 @@ export default function VehicleRegistryScreen() {
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        
+
         {/* HEADER */}
         <View style={styles.headerRow}>
           <Text style={styles.pageTitle}>Vehicle Registry</Text>
@@ -349,11 +349,11 @@ export default function VehicleRegistryScreen() {
         <View style={styles.listContainer}>
           {filteredVehicles.length > 0 ? (
             filteredVehicles.map((vehicle: any) => (
-              <VehicleCard 
-                key={vehicle.vehicleID || vehicle.id} 
-                vehicle={vehicle} 
-                onEdit={openEditModal} 
-                onDelete={handleDelete} 
+              <VehicleCard
+                key={vehicle.vehicleID || vehicle.id}
+                vehicle={vehicle}
+                onEdit={openEditModal}
+                onDelete={handleDelete}
               />
             ))
           ) : (
@@ -442,7 +442,7 @@ export default function VehicleRegistryScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.bg },
+  screen: { flex: 1, backgroundColor: colors.bg, paddingBottom: rf(90) },
   container: { paddingHorizontal: rf(16), paddingVertical: rf(24), paddingBottom: rf(40), flexGrow: 1 },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: rf(20) },
   pageTitle: { color: colors.textPrimary, fontSize: rf(28), fontWeight: '800', letterSpacing: -1 },
@@ -454,8 +454,8 @@ const styles = StyleSheet.create({
   filterChip: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.panel, borderWidth: 1, borderColor: colors.border, borderRadius: rf(8), paddingHorizontal: rf(12), paddingVertical: rf(10), gap: rf(6), height: rf(44) },
   filterChipLabel: { color: colors.textMuted, fontSize: rf(13) },
   filterChipValue: { color: colors.textPrimary, fontSize: rf(13), fontWeight: '600' },
-  filterModalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'center', padding: rf(24) },
-  bottomSheetOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.6)', justifyContent: 'flex-end' },
+  filterModalOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.2)', justifyContent: 'center', padding: rf(24) },
+  bottomSheetOverlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.2)', justifyContent: 'flex-end' },
   dropdownContainer: { backgroundColor: colors.surface, borderRadius: rf(16), borderWidth: 1, borderColor: colors.border, maxHeight: '60%', overflow: 'hidden', paddingVertical: rf(8) },
   dropdownTitle: { color: colors.textMuted, fontSize: rf(12), fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, paddingHorizontal: rf(20), paddingVertical: rf(12), borderBottomWidth: 1, borderBottomColor: colors.borderSoft, marginBottom: rf(8) },
   dropdownOption: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: rf(14), paddingHorizontal: rf(20) },

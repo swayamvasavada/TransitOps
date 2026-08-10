@@ -86,8 +86,8 @@ const FilterChip = ({ label, value, options, onChange }: any) => {
         animationType="fade"
         onRequestClose={() => setIsOpen(false)}
       >
-        <Pressable 
-          style={styles.modalOverlay} 
+        <Pressable
+          style={styles.modalOverlay}
           onPress={() => setIsOpen(false)}
         >
           <View style={styles.dropdownContainer}>
@@ -173,7 +173,7 @@ export default function DashboardScreen() {
       const matchesType = vehicleType === 'All' || trip.type === vehicleType;
       const matchesStatus = statusFilter === 'All' || trip.status === statusFilter;
       const matchesRegion = region === 'All' || trip.region === region;
-      
+
       return matchesSearch && matchesType && matchesStatus && matchesRegion;
     });
   }, [search, vehicleType, statusFilter, region]);
@@ -181,7 +181,7 @@ export default function DashboardScreen() {
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
-        
+
         {/* HEADER & SEARCH */}
         <Text style={styles.pageTitle}>Dashboard</Text>
         <View style={styles.searchContainer}>
@@ -199,23 +199,23 @@ export default function DashboardScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionHeader}>Filters</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterScroll}>
-            <FilterChip 
-              label="Type" 
-              value={vehicleType} 
-              onChange={setVehicleType} 
-              options={['All', 'Van', 'Truck', 'Mini']} 
+            <FilterChip
+              label="Type"
+              value={vehicleType}
+              onChange={setVehicleType}
+              options={['All', 'Van', 'Truck', 'Mini']}
             />
-            <FilterChip 
-              label="Status" 
-              value={statusFilter} 
-              onChange={setStatusFilter} 
-              options={['All', 'On Trip', 'Completed', 'Dispatched', 'Draft']} 
+            <FilterChip
+              label="Status"
+              value={statusFilter}
+              onChange={setStatusFilter}
+              options={['All', 'On Trip', 'Completed', 'Dispatched', 'Draft']}
             />
-            <FilterChip 
-              label="Region" 
-              value={region} 
-              onChange={setRegion} 
-              options={['All', 'North', 'South', 'East', 'West']} 
+            <FilterChip
+              label="Region"
+              value={region}
+              onChange={setRegion}
+              options={['All', 'North', 'South', 'East', 'West']}
             />
           </ScrollView>
         </View>
@@ -243,11 +243,11 @@ export default function DashboardScreen() {
                   <View key={row.label} style={styles.statusRow}>
                     <Text style={styles.statusLabel}>{row.label}</Text>
                     <View style={styles.progressBarBg}>
-                      <View 
+                      <View
                         style={[
-                          styles.progressBarFill, 
+                          styles.progressBarFill,
                           { width: `${(row.value / row.max) * 100}%`, backgroundColor: row.color }
-                        ]} 
+                        ]}
                       />
                     </View>
                     <Text style={styles.statusValue}>{row.value}</Text>
@@ -263,7 +263,7 @@ export default function DashboardScreen() {
           <Text style={styles.sectionHeader}>
             {search ? `Search Results (${filteredTrips.length})` : 'Recent Trips'}
           </Text>
-          
+
           <View style={styles.tripsContainer}>
             {filteredTrips.length > 0 ? (
               filteredTrips.map((trip) => (
@@ -292,6 +292,7 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: colors.bg,
+    paddingBottom: rf(50)
   },
   container: {
     paddingHorizontal: rf(16),
@@ -300,9 +301,9 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   pageTitle: {
-    color: colors.textPrimary, 
-    fontSize: rf(28), 
-    fontWeight: '800', 
+    color: colors.textPrimary,
+    fontSize: rf(28),
+    fontWeight: '800',
     marginBottom: rf(20),
     letterSpacing: -1,
   },
@@ -338,8 +339,8 @@ const styles = StyleSheet.create({
   filterScroll: {
     gap: rf(10),
     // paddingRight: rf(16),
-    alignItems:'center',
-    justifyContent:'center'
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   filterChip: {
     flexDirection: 'row',
@@ -539,7 +540,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
     justifyContent: 'center',
     padding: rf(24),
   },
