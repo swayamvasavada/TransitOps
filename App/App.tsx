@@ -19,7 +19,7 @@ export default function App() {
     // Add a slight delay to the splash screen for visual effect
     Promise.all([
       hydrateAuth(),
-      new Promise(resolve => setTimeout(resolve, 1500))
+      new Promise(resolve => setTimeout(() => resolve(null), 1500))
     ]).finally(() => setReady(true));
   }, [hydrateAuth]);
 
@@ -30,7 +30,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <StatusBar barStyle="light-content" backgroundColor="#0a0e17" />
-      <NavigationContainer theme={navigationTheme} linking={linking}>
+      <NavigationContainer theme={navigationTheme} linking={linking as any}>
         <RootNavigator />
         <Loader show={globalLoading} text="Please wait" />
       </NavigationContainer>

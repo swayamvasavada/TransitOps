@@ -20,7 +20,13 @@ import {
   History,
   ChevronDown,
   SearchX,
+  Menu,
+  Bell,
+  MapPin,
+  Clock,
 } from 'lucide-react-native';
+import ClockInWidget from '../components/ClockInWidget';
+import AttendanceHistory from '../components/AttendanceHistory';
 import { colors } from '../theme/colors';
 import { rf } from '../theme/responsive';
 
@@ -159,7 +165,7 @@ export default function DashboardScreen() {
   const [search, setSearch] = useState('');
   const [vehicleType, setVehicleType] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
-  const [region, setRegion] = useState('All');
+
 
   // Filtering Logic (Ready for API integration when MOCK_TRIPS is replaced by store data)
   const filteredTrips = useMemo(() => {
@@ -172,11 +178,9 @@ export default function DashboardScreen() {
         trip.status.toLowerCase().includes(searchLower);
       const matchesType = vehicleType === 'All' || trip.type === vehicleType;
       const matchesStatus = statusFilter === 'All' || trip.status === statusFilter;
-      const matchesRegion = region === 'All' || trip.region === region;
-
-      return matchesSearch && matchesType && matchesStatus && matchesRegion;
+      return matchesSearch && matchesType && matchesStatus;
     });
-  }, [search, vehicleType, statusFilter, region]);
+  }, [search, vehicleType, statusFilter]);
 
   return (
     <View style={styles.screen}>
@@ -211,18 +215,16 @@ export default function DashboardScreen() {
               onChange={setStatusFilter}
               options={['All', 'On Trip', 'Completed', 'Dispatched', 'Draft']}
             />
-            <FilterChip
-              label="Region"
-              value={region}
-              onChange={setRegion}
-              options={['All', 'North', 'South', 'East', 'West']}
-            />
+
           </ScrollView>
         </View>
 
         {/* STATS & VEHICLE STATUS (Hidden when searching) */}
         {!search && (
           <>
+            <ClockInWidget />
+            <AttendanceHistory />
+
             <View style={styles.section}>
               <Text style={styles.sectionHeader}>Overview</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.statsScroll}>

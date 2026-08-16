@@ -8,6 +8,8 @@ import MaintenanceScreen from '../screens/MaintenanceScreen';
 import TripDispatcherScreen from '../screens/TripDispatcherScreen';
 import VehicleRegistryScreen from '../screens/VehicleRegistryScreen';
 import CustomTabBar from './CustomTabBar';
+import ChatScreen from '../screens/ChatScreen';
+import LiveTrackingScreen from '../screens/LiveTrackingScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -26,6 +28,8 @@ export default function MainTabsNavigator() {
       <Tab.Screen name="Maintenance" component={MaintenanceScreen} />
       <Tab.Screen name="FuelExpense" component={FuelExpenseScreen} />
       <Tab.Screen name="Analytics" component={AnalyticsScreen} />
+      <Tab.Screen name="Chat" component={ChatScreen} />
+      <Tab.Screen name="LiveTracking" component={LiveTrackingScreen} />
     </Tab.Navigator>
   );
 }
