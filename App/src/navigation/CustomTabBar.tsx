@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Pressable, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Pressable, StyleSheet, Dimensions, Alert } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -19,9 +19,11 @@ import {
   MoreHorizontal,
   X,
   MessageSquare,
+  Sparkles,
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { rf } from '../theme/responsive';
+import { useAttendanceStore } from '../store/AttendanceStore';
 
 const { width } = Dimensions.get('window');
 
@@ -45,6 +47,8 @@ const getIcon = (routeName: string, color: string, size: number) => {
       return <MessageSquare color={color} size={size} />;
     case 'LiveTracking':
       return <Map color={color} size={size} />;
+    case 'AIAssistant':
+      return <Sparkles color={color} size={size} />;
     default:
       return <LayoutDashboard color={color} size={size} />;
   }
@@ -70,6 +74,8 @@ const getLabel = (routeName: string) => {
       return 'Chat';
     case 'LiveTracking':
       return 'Tracking';
+    case 'AIAssistant':
+      return 'AI Assistant';
     default:
       return routeName;
   }
@@ -78,6 +84,8 @@ const getLabel = (routeName: string) => {
 export default function CustomTabBar({ state, descriptors, navigation }: any) {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const animation = useSharedValue(0);
+  const { status } = useAttendanceStore();
+  const isClockedIn = status === 'CLOCKED_IN';
 
   useEffect(() => {
     animation.value = withTiming(isMoreOpen ? 1 : 0, {
@@ -112,6 +120,12 @@ export default function CustomTabBar({ state, descriptors, navigation }: any) {
   const isSecondaryActive = secondaryRoutes.some((route: any) => route.key === state.routes[state.index].key);
 
   const handlePress = (route: any, isFocused: boolean) => {
+    if (route.name !== 'Dashboard' && !isClockedIn) {
+      Alert.alert('Clock In Required', 'Please clock in first to access other features.');
+      if (isMoreOpen) setIsMoreOpen(false);
+      return;
+    }
+
     if (isMoreOpen) setIsMoreOpen(false);
 
     const event = navigation.emit({
@@ -161,6 +175,20 @@ export default function CustomTabBar({ state, descriptors, navigation }: any) {
         {primaryRoutes.map((route: any, index: number) => {
           const isFocused = state.index === index;
           const color = isFocused ? colors.amber : colors.textMuted;
+
+          if (route.name === 'AIAssistant') {
+            return (
+              <View key={route.key} style={styles.tabItem}>
+                <Pressable
+                  style={styles.fabBump}
+                  onPress={() => handlePress(route, isFocused)}>
+                  <View style={[styles.fabButton, isFocused && { transform: [{ scale: 1.05 }] }]}>
+                    <Sparkles color={colors.panel} size={28} />
+                  </View>
+                </Pressable>
+              </View>
+            );
+          }
 
           return (
             <Pressable
@@ -231,6 +259,33 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    height: 50, // Fixed height for alignment
+  },
+  fabBump: {
+    position: 'absolute',
+    top: -30,
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    backgroundColor: colors.panel,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  fabButton: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    backgroundColor: '#C84B31', // Matching the red/orange from the reference
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#C84B31',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
   },
   activeIndicator: {
     position: 'absolute',

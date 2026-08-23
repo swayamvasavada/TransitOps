@@ -18,7 +18,10 @@ import {
   X,
   ChevronDown,
   AlertTriangle,
+  Camera,
 } from 'lucide-react-native';
+import { launchCamera } from 'react-native-image-picker';
+import { scanLicenseImage } from '../services/drivingLicenseScanner';
 import { rf } from '../theme/responsive';
 import { colors } from '../theme/colors';
 import useDriverStore from '../store/DriverStore';
@@ -174,6 +177,49 @@ export default function DriversScreen() {
   const [formSafety, setFormSafety] = useState('100');
   const [formStatus, setFormStatus] = useState('Available');
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+
+  const handleScanLicense = async () => {
+    try {
+      const result = await launchCamera({
+        mediaType: 'photo',
+        cameraType: 'back',
+        quality: 0.8,
+      });
+
+      if (result.didCancel) return;
+      
+      if (result.errorCode) {
+        if (result.errorCode === 'camera_unavailable') {
+           Alert.alert('Error', 'Camera is unavailable on this device.');
+           return;
+        }
+        if (result.errorCode === 'permission') {
+           Alert.alert('Permission Denied', 'Camera permission is required to scan your driving licence.');
+           return;
+        }
+        Alert.alert('Error', result.errorMessage || 'Failed to open camera.');
+        return;
+      }
+
+      if (result.assets && result.assets.length > 0) {
+        const uri = result.assets[0].uri;
+        if (!uri) return;
+
+        setIsScanning(true);
+        const extractedData = await scanLicenseImage(uri);
+        
+        if (extractedData.fullName) setFormName(extractedData.fullName);
+        if (extractedData.licenseNumber) setFormLicense(extractedData.licenseNumber);
+        if (extractedData.expiryDate) setFormExpiry(extractedData.expiryDate);
+        
+        setIsScanning(false);
+      }
+    } catch (error) {
+      setIsScanning(false);
+      Alert.alert('Scan Failed', 'We couldn\'t read the licence. You can try again or enter the details manually.');
+    }
+  };
 
   // useEffect(() => {
   //   fetchDrivers();
@@ -314,6 +360,17 @@ export default function DriversScreen() {
               </Pressable>
             </View>
 
+            <Pressable 
+              style={[styles.scanButton, isScanning && { opacity: 0.5 }]} 
+              onPress={handleScanLicense}
+              disabled={isScanning}
+            >
+              <Camera size={18} color={colors.panel} />
+              <Text style={styles.scanButtonText}>
+                {isScanning ? 'Processing...' : 'Scan Driving Licence'}
+              </Text>
+            </Pressable>
+
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.formContainer}>
               <View style={styles.formRow}>
                 <View style={styles.formGroup}>
@@ -438,6 +495,23 @@ const styles = StyleSheet.create({
   bottomSheetHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: rf(24) },
   bottomSheetTitle: { color: colors.textPrimary, fontSize: rf(20), fontWeight: '700' },
   bottomSheetSubtitle: { color: colors.textMuted, fontSize: rf(13), marginTop: rf(4) },
+  
+  scanButton: {
+    backgroundColor: colors.blue,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: rf(12),
+    borderRadius: rf(10),
+    marginBottom: rf(16),
+  },
+  scanButtonText: {
+    color: colors.panel,
+    fontSize: rf(14),
+    fontWeight: '600',
+    marginLeft: rf(8),
+  },
+
   formContainer: { gap: rf(16), paddingBottom: rf(20) },
   formRow: { flexDirection: 'row', gap: rf(12) },
   formGroup: { flex: 1, gap: rf(6) },

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Navigation, Truck, MapPin, SearchX } from 'lucide-react-native';
 import useTripStore from '../store/TripStore';
-import LiveMap from '../components/LiveMap';
+import FleetMap from '../components/FleetMap';
 import { colors } from '../theme/colors';
 import { rf } from '../theme/responsive';
 
@@ -62,7 +62,11 @@ export default function LiveTrackingScreen() {
 
   return (
     <View style={styles.screen}>
-      <LiveMap trip={selectedTrip} />
+      <FleetMap 
+        trips={activeTrips} 
+        selectedTrip={selectedTrip} 
+        onSelectTrip={setSelectedTrip} 
+      />
 
       <View style={[styles.listSection, { paddingBottom: insets.bottom + 100 }]}>
         <View style={styles.listHeader}>

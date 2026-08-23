@@ -33,6 +33,8 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>LogiSphere AI requires camera access to scan driving licences and populate driver details.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>LogiSphere AI requires your location to securely verify your presence during attendance clock-in.</string>
 	<key>RCTNewArchEnabled</key>

@@ -10,6 +10,7 @@ import VehicleRegistryScreen from '../screens/VehicleRegistryScreen';
 import CustomTabBar from './CustomTabBar';
 import ChatScreen from '../screens/ChatScreen';
 import LiveTrackingScreen from '../screens/LiveTrackingScreen';
+import AIAssistantScreen from '../screens/AIAssistantScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -21,10 +22,11 @@ export default function MainTabsNavigator() {
       {/* Primary Screens (Indices 0-3) */}
       <Tab.Screen name="Dashboard" component={DashboardScreen} />
       <Tab.Screen name="VehicleRegistry" component={VehicleRegistryScreen} />
+      <Tab.Screen name="AIAssistant" component={AIAssistantScreen} />
       <Tab.Screen name="Drivers" component={DriversScreen} />
-      <Tab.Screen name="TripDispatcher" component={TripDispatcherScreen} />
       
-      {/* Secondary Screens (Indices 4-6) */}
+      {/* Secondary Screens (Indices 4-8) */}
+      <Tab.Screen name="TripDispatcher" component={TripDispatcherScreen} />
       <Tab.Screen name="Maintenance" component={MaintenanceScreen} />
       <Tab.Screen name="FuelExpense" component={FuelExpenseScreen} />
       <Tab.Screen name="Analytics" component={AnalyticsScreen} />
