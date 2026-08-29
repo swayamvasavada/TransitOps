@@ -7,6 +7,7 @@ import {
   Modal,
   SafeAreaView,
   ScrollView,
+  Image,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { authColors } from "../colors/colors";
@@ -76,8 +77,17 @@ export default function ScreenWrapper({ children, title }: ScreenWrapperProps) {
           <View style={styles.sidebarContainer}>
             <SafeAreaView style={styles.sidebarSafeArea}>
               <View style={styles.sidebarHeader}>
-                <Text style={styles.logoText}>Transit<Text style={styles.logoAccent}>Sync</Text></Text>
-                <Text style={styles.logoSubtitle}>Dispatch Console</Text>
+                <View style={styles.sidebarLogoRow}>
+                  <Image
+                    source={require("../assets/logo.png")}
+                    style={styles.sidebarLogoImage}
+                    resizeMode="contain"
+                  />
+                  <View>
+                    <Text style={styles.logoText}>Transit<Text style={styles.logoAccent}>Sync</Text></Text>
+                    <Text style={styles.logoSubtitle}>Dispatch Console</Text>
+                  </View>
+                </View>
               </View>
 
               {user && (
@@ -179,9 +189,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sidebarHeader: {
-    padding: 24,
+    padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: authColors.cardBorder,
+  },
+  sidebarLogoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  sidebarLogoImage: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
   },
   logoText: {
     fontSize: 24,

@@ -10,6 +10,7 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { authColors } from "../colors/colors";
@@ -52,6 +53,11 @@ export default function LoginScreen() {
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.headerContainer}>
+            <Image
+              source={require("../assets/logo.png")}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
             <Text style={styles.logoText}>Transit<Text style={styles.logoAccent}>Sync</Text></Text>
             <Text style={styles.subtitle}>Fleet Dispatch Console</Text>
           </View>
@@ -149,6 +155,12 @@ const styles = StyleSheet.create({
   headerContainer: {
     alignItems: "center",
     marginBottom: 36,
+  },
+  logoImage: {
+    width: 72,
+    height: 72,
+    marginBottom: 12,
+    borderRadius: 16,
   },
   logoText: {
     fontSize: 36,

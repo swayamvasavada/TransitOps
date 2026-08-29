@@ -10,6 +10,7 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { authColors } from "../colors/colors";
@@ -23,14 +24,15 @@ export default function SignupScreen() {
   const [phoneNo, setPhoneNo] = useState("");
   const [licenseNo, setLicenseNo] = useState("");
   const [licenseExpiry, setLicenseExpiry] = useState(""); // MM/YYYY format
-  const [selectedRole, setSelectedRole] = useState("ROLE_DISPATCHER");
+  const [selectedRole, setSelectedRole] = useState("ROLE_DRIVER");
+
   const { signup, loading, error } = useAuthStore();
   const navigation = useNavigation<any>();
 
   const roles = [
-    { label: "Dispatcher", value: "ROLE_DISPATCHER" },
-    { label: "Admin", value: "ROLE_ADMIN" },
-    { label: "Driver", value: "ROLE_DRIVER" },
+    { label: "Driver", value: "ROLE_DRIVER", icon: "🚚" },
+    { label: "Dispatcher", value: "ROLE_DISPATCHER", icon: "📋" },
+    { label: "Admin", value: "ROLE_ADMIN", icon: "🛡️" },
   ];
 
   const handleSignup = async () => {
@@ -89,6 +91,11 @@ export default function SignupScreen() {
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.headerContainer}>
+            <Image
+              source={require("../assets/logo.png")}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
             <Text style={styles.logoText}>Transit<Text style={styles.logoAccent}>Sync</Text></Text>
             <Text style={styles.subtitle}>Register New Account</Text>
           </View>
@@ -226,6 +233,12 @@ const styles = StyleSheet.create({
   headerContainer: {
     alignItems: "center",
     marginBottom: 28,
+  },
+  logoImage: {
+    width: 64,
+    height: 64,
+    marginBottom: 10,
+    borderRadius: 14,
   },
   logoText: {
     fontSize: 32,
