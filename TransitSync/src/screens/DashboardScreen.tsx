@@ -118,7 +118,7 @@ export default function DashboardScreen() {
           ))}
         </ScrollView>
           {/* Add Attendance Button */}
-          <TouchableOpacity style={styles.addAttendanceButton} onPress={() => navigation.navigate('Attendance')}>
+          <TouchableOpacity style={styles.addAttendanceButton} onPress={() => (navigation as any).navigate('Attendance')}>
             <Text style={styles.addAttendanceButtonText}>Add Attendance</Text>
           </TouchableOpacity>
 

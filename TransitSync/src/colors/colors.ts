@@ -1,93 +1,93 @@
 export const authColors = {
-  // Base & Canvas (Deep Space & Slate Foundation)
-  pageBg: "#0B0F17",
+  // Base & Canvas (Light Foundation)
+  pageBg: "#F8FAFC",
   transparent: "transparent",
   white: "#FFFFFF",
   darkText: "#0F172A",
   gray: "#64748B",
 
-  // Premium Glassmorphic Cards (Elevated Layers)
-  cardBg: "#111726", // Solid dark slate for mobile cards
-  cardBorder: "#212c45",
-  cardInsetBorder: "rgba(255, 255, 255, 0.04)",
-  cardShadow: "rgba(2, 6, 23, 0.65)",
+  // Modern Light Cards
+  cardBg: "#FFFFFF",
+  cardBorder: "#E2E8F0",
+  cardInsetBorder: "rgba(15, 23, 42, 0.04)",
+  cardShadow: "rgba(15, 23, 42, 0.06)",
 
-  // Branding & Accent Glows
-  logoRing: "#38BDF8",
-  logoGlow: "rgba(56, 189, 248, 0.35)",
+  // Branding & Accent Glows (Electric Blue & Deep Navy)
+  logoRing: "#2563EB", // Electric Blue
+  logoGlow: "rgba(37, 99, 235, 0.25)",
 
   // Active Role / Interactive States
-  roleAccent: "#ffb020", // Transit amber
-  roleAccentHover: "#7DD3FC",
-  roleActiveBg: "rgba(255, 176, 32, 0.12)",
-  roleActiveBorder: "rgba(255, 176, 32, 0.45)",
+  roleAccent: "#2563EB", // Electric Blue accent
+  roleAccentHover: "#1D4ED8",
+  roleActiveBg: "rgba(37, 99, 235, 0.10)",
+  roleActiveBorder: "rgba(37, 99, 235, 0.35)",
 
-  // Glass Inputs & Controls
-  inputBg: "#0d1220",
-  inputBorder: "#212c45",
-  inputBorderFocus: "#ffb020",
+  // Light Inputs & Controls
+  inputBg: "#FFFFFF",
+  inputBorder: "#CBD5E1",
+  inputBorderFocus: "#2563EB",
 
-  // Slate Neutral Hierarchy
-  neutral700: "#334155",
-  neutral600: "#475569",
+  // Navy & Slate Neutral Hierarchy
+  neutral700: "#1E293B",
+  neutral600: "#334155",
   neutral500: "#64748B",
   neutral400: "#94A3B8",
 
   // System States: Success & Ready
   success: "#10B981",
-  successBg: "rgba(16, 185, 129, 0.12)",
-  successBorder: "rgba(16, 185, 129, 0.40)",
+  successBg: "#ECFDF5",
+  successBorder: "#A7F3D0",
 
   // System States: Danger & Fault
-  error: "#F43F5E",
-  errorBg: "rgba(244, 63, 94, 0.10)",
-  errorBorder: "rgba(244, 63, 94, 0.30)",
+  error: "#EF4444",
+  errorBg: "#FEF2F2",
+  errorBorder: "#FCA5A5",
 
-  divider: "rgba(255, 255, 255, 0.07)",
+  divider: "#E2E8F0",
 
   // Status Badges
-  successBadgeBg: "rgba(16, 185, 129, 0.15)",
-  successBadgeBorder: "rgba(16, 185, 129, 0.35)",
-  successBadgeIcon: "#34D399",
+  successBadgeBg: "#D1FAE5",
+  successBadgeBorder: "#6EE7B7",
+  successBadgeIcon: "#059669",
 
-  // Smart Registry & Data Table (Modern High-Contrast UI)
-  registryBg: "#0F172A",
-  registryBorder: "rgba(255, 255, 255, 0.08)",
-  registryHeaderBg: "#1E293B",
-  registryRowBg: "#0F172A",
-  registryRowAltBg: "rgba(30, 41, 59, 0.5)",
-  registryRowHover: "rgba(56, 189, 248, 0.06)",
+  // Registry & Data Table (Light High-Contrast UI)
+  registryBg: "#F8FAFC",
+  registryBorder: "#E2E8F0",
+  registryHeaderBg: "#0F172A", // Deep Navy Header
+  registryRowBg: "#FFFFFF",
+  registryRowAltBg: "#F1F5F9",
+  registryRowHover: "rgba(37, 99, 235, 0.05)",
 
   // Typography Scale
-  slateText800: "#F8FAFC",
-  slateText600: "#CBD5E1",
+  slateText800: "#0F172A",
+  slateText600: "#334155",
   slateText400: "#64748B",
-  textPrimary: "#eef1f8",
-  textSecondary: "#8891ab",
-  textMuted: "#525c79",
+  textPrimary: "#0F172A", // Deep Navy Text
+  textSecondary: "#475569", // Slate Subtitle
+  textMuted: "#64748B",
 
-  // Transition Teal Accents
-  teal400: "#2DD4BF",
-  teal500: "#14B8A6",
-  teal600: "#0D9488",
+  // Electric Blue & Cyan Accents
+  teal400: "#3B82F6",
+  teal500: "#2563EB",
+  teal600: "#1D4ED8",
 
-  // Smart Transition States
-  statusIdleBg: "rgba(245, 158, 11, 0.12)",
-  statusIdleText: "#FBBF24",
-  statusIdleBorder: "rgba(245, 158, 11, 0.30)",
+  // Status States
+  statusIdleBg: "#FEF3C7",
+  statusIdleText: "#D97706",
+  statusIdleBorder: "#FDE68A",
 
-  statusActiveBg: "rgba(16, 185, 129, 0.12)",
-  statusActiveText: "#34D399",
-  statusActiveBorder: "rgba(16, 185, 129, 0.30)",
+  statusActiveBg: "#D1FAE5",
+  statusActiveText: "#059669",
+  statusActiveBorder: "#A7F3D0",
 
-  statusMaintenanceBg: "rgba(244, 63, 94, 0.12)",
-  statusMaintenanceText: "#FB7185",
-  statusMaintenanceBorder: "rgba(244, 63, 94, 0.30)",
+  statusMaintenanceBg: "#FEE2E2",
+  statusMaintenanceText: "#DC2626",
+  statusMaintenanceBorder: "#FECACA",
 
-  statusSyncingBg: "rgba(139, 92, 246, 0.12)",
-  statusSyncingText: "#A78BFA",
-  statusSyncingBorder: "rgba(139, 92, 246, 0.30)",
+  statusSyncingBg: "#EDE9FE",
+  statusSyncingText: "#7C3AED",
+  statusSyncingBorder: "#DDD6FE",
 
-  modalOverlay: "rgba(2, 6, 23, 0.75)",
-  deleteText: "#FB7185",
+  modalOverlay: "rgba(15, 23, 42, 0.40)",
+  deleteText: "#EF4444",
 };

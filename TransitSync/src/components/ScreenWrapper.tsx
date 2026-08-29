@@ -5,10 +5,10 @@ import {
   Text,
   TouchableOpacity,
   Modal,
-  SafeAreaView,
   ScrollView,
   Image,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { authColors } from "../colors/colors";
 import useAuthStore from "../store/AuthStore";
@@ -49,7 +49,7 @@ export default function ScreenWrapper({ children, title }: ScreenWrapperProps) {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right", "bottom"]}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.menuButton} onPress={() => setMenuVisible(true)}>
           <Text style={styles.menuButtonText}>☰</Text>
@@ -75,7 +75,7 @@ export default function ScreenWrapper({ children, title }: ScreenWrapperProps) {
           onPress={() => setMenuVisible(false)}
         >
           <View style={styles.sidebarContainer}>
-            <SafeAreaView style={styles.sidebarSafeArea}>
+            <SafeAreaView style={styles.sidebarSafeArea} edges={["top", "bottom", "left"]}>
               <View style={styles.sidebarHeader}>
                 <View style={styles.sidebarLogoRow}>
                   <Image

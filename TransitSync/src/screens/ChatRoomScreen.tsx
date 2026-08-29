@@ -14,6 +14,7 @@ import {
   Modal,
   Dimensions,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   launchImageLibrary,
@@ -343,7 +344,7 @@ export default function ChatRoomScreen() {
   const canSend = !!inputText.trim() || !!pendingMedia;
 
   return (
-    <View style={styles.screen}>
+    <SafeAreaView style={styles.screen} edges={["top", "left", "right", "bottom"]}>
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
@@ -461,7 +462,7 @@ export default function ChatRoomScreen() {
       {lightboxUri && (
         <ImageLightbox uri={lightboxUri} onClose={() => setLightboxUri(null)} />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 

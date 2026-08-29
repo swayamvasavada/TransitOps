@@ -5,13 +5,13 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Alert,
   Image,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { authColors } from "../colors/colors";
 import useAuthStore from "../store/AuthStore";
@@ -83,7 +83,7 @@ export default function SignupScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right", "bottom"]}>
       <Loader show={loading} text="Creating account..." />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}

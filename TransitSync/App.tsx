@@ -11,7 +11,7 @@ function App() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle="light-content" backgroundColor="#0B0F17" />
+      <StatusBar barStyle="dark-content" backgroundColor="#F8FAFC" />
       <AppNavigator />
     </SafeAreaProvider>
   );

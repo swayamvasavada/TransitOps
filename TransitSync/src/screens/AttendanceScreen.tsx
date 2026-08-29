@@ -3,11 +3,11 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   StatusBar,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { authColors } from '../colors/colors';
 import {
@@ -24,8 +24,8 @@ export default function AttendanceScreen() {
   const statusBg = present ? '#d4edda' : '#f8d7da';
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor={authColors.background} />
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right", "bottom"]}>
+      <StatusBar barStyle="dark-content" backgroundColor={authColors.pageBg} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -91,7 +91,7 @@ export default function AttendanceScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: authColors.background,
+    backgroundColor: authColors.pageBg,
   },
   header: {
     flexDirection: 'row',
