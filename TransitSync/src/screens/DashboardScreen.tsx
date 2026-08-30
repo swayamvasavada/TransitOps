@@ -117,10 +117,16 @@ export default function DashboardScreen() {
             </View>
           ))}
         </ScrollView>
-          {/* Add Attendance Button */}
-          <TouchableOpacity style={styles.addAttendanceButton} onPress={() => (navigation as any).navigate('Attendance')}>
-            <Text style={styles.addAttendanceButtonText}>Add Attendance</Text>
-          </TouchableOpacity>
+          {/* Quick Action Row */}
+          <View style={{ flexDirection: "row", gap: 10, marginBottom: 16 }}>
+            <TouchableOpacity style={[styles.addAttendanceButton, { flex: 1, marginBottom: 0 }]} onPress={() => (navigation as any).navigate('Attendance')}>
+              <Text style={styles.addAttendanceButtonText}>📋 Attendance</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.addAttendanceButton, { flex: 1, marginBottom: 0, backgroundColor: authColors.roleAccent }]} onPress={() => (navigation as any).navigate('DriverNavigation')}>
+              <Text style={styles.addAttendanceButtonText}>🗺️ Driver Map & Navigation</Text>
+            </TouchableOpacity>
+          </View>
 
         {/* Trips Search & Header */}
         <View style={styles.listHeaderContainer}>

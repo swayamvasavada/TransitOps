@@ -32,6 +32,7 @@ export default function ScreenWrapper({ children, title }: ScreenWrapperProps) {
 
   const navItems = [
     { label: "Dashboard", screen: "Dashboard", icon: "📊" },
+    { label: "Driver Navigation", screen: "DriverNavigation", icon: "🗺️" },
     { label: "Vehicle Registry", screen: "Vehicles", icon: "🚚" },
     { label: "Drivers Profiles", screen: "Drivers", icon: "👥" },
     { label: "Trip Dispatcher", screen: "Dispatch", icon: "📋" },
