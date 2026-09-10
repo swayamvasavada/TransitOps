@@ -80,7 +80,7 @@ export default function ScreenWrapper({ children, title }: ScreenWrapperProps) {
               <View style={styles.sidebarHeader}>
                 <View style={styles.sidebarLogoRow}>
                   <Image
-                    source={require("../assets/logo.png")}
+                    source={require("../assets/ChatGPT Image Aug 23, 2026, 08_28_18 PM.png")}
                     style={styles.sidebarLogoImage}
                     resizeMode="contain"
                   />

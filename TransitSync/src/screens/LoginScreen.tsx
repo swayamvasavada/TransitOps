@@ -54,7 +54,7 @@ export default function LoginScreen() {
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.headerContainer}>
             <Image
-              source={require("../assets/logo.png")}
+              source={require("../assets/ChatGPT Image Aug 23, 2026, 08_28_18 PM.png")}
               style={styles.logoImage}
               resizeMode="contain"
             />
