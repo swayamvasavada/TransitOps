@@ -14,9 +14,10 @@ interface FleetMapProps {
   trips: any[];
   selectedTrip: any | null;
   onSelectTrip: (trip: any) => void;
+  style?: any;
 }
 
-export default function FleetMap({ trips, selectedTrip, onSelectTrip }: FleetMapProps) {
+export default function FleetMap({ trips, selectedTrip, onSelectTrip, style }: FleetMapProps) {
   const cameraRef = useRef<any>(null); // Type is CameraRef, but any is safe here
 
   // We manage the local state of vehicles for mock movement simulation
@@ -84,7 +85,7 @@ export default function FleetMap({ trips, selectedTrip, onSelectTrip }: FleetMap
   const maxLat = Math.max(...lats) || 23.1;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <Map
         style={styles.map}
         mapStyle={styleURL}

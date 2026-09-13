@@ -26,6 +26,7 @@ import { colors } from '../theme/colors';
 import useTripStore from '../store/TripStore';
 import useVehicleStore from '../store/VehicleStore';
 import useDriverStore from '../store/DriverStore';
+import FleetMap from '../components/FleetMap';
 
 // --- CONSTANTS ---
 const TRIP_STATUS: Record<string, any> = {
@@ -92,6 +93,8 @@ export default function TripDispatcherScreen() {
   const [actionModal, setActionModal] = useState<{ visible: boolean; type: 'COMPLETE' | 'CANCEL'; trip: any } | null>(null);
   const [actionOdo, setActionOdo] = useState('');
   const [actionFuel, setActionFuel] = useState('0');
+
+  const [mapModalTrip, setMapModalTrip] = useState<any | null>(null);
 
   // useEffect(() => {
   //   getTrips();
@@ -269,30 +272,38 @@ export default function TripDispatcherScreen() {
                       </View>
                       <Text style={styles.noteText}>{note}</Text>
                     </View>
-                    {(t.status === 'DRAFT' || t.status === 'DISPATCHED') && (
-                      <View style={styles.actionsRow}>
-                        <Pressable 
-                          style={styles.actionBtnCheck} 
-                          onPress={() => {
-                            setActionOdo(String(t.startingOdometer ?? '0'));
-                            setActionFuel('0');
-                            setActionModal({ visible: true, type: 'COMPLETE', trip: t });
-                          }}
-                        >
-                          <Check size={16} color={colors.green} />
-                        </Pressable>
-                        <Pressable 
-                          style={styles.actionBtnCross}
-                          onPress={() => {
-                            setActionOdo(String(t.startingOdometer ?? '0'));
-                            setActionFuel('0');
-                            setActionModal({ visible: true, type: 'CANCEL', trip: t });
-                          }}
-                        >
-                          <X size={16} color={colors.rose} />
-                        </Pressable>
-                      </View>
-                    )}
+                    <View style={styles.actionsRow}>
+                      <Pressable 
+                        style={[styles.actionBtnCheck, { borderColor: colors.blue, backgroundColor: 'rgba(56,189,248,0.1)', marginRight: 8 }]}
+                        onPress={() => setMapModalTrip(t)}
+                      >
+                        <Map size={16} color={colors.blue} />
+                      </Pressable>
+                      {(t.status === 'DRAFT' || t.status === 'DISPATCHED') && (
+                        <>
+                          <Pressable 
+                            style={styles.actionBtnCheck} 
+                            onPress={() => {
+                              setActionOdo(String(t.startingOdometer ?? '0'));
+                              setActionFuel('0');
+                              setActionModal({ visible: true, type: 'COMPLETE', trip: t });
+                            }}
+                          >
+                            <Check size={16} color={colors.green} />
+                          </Pressable>
+                          <Pressable 
+                            style={styles.actionBtnCross}
+                            onPress={() => {
+                              setActionOdo(String(t.startingOdometer ?? '0'));
+                              setActionFuel('0');
+                              setActionModal({ visible: true, type: 'CANCEL', trip: t });
+                            }}
+                          >
+                            <X size={16} color={colors.rose} />
+                          </Pressable>
+                        </>
+                      )}
+                    </View>
                   </View>
                 </View>
               );
@@ -310,6 +321,26 @@ export default function TripDispatcherScreen() {
           )}
         </View>
       </ScrollView>
+
+      {/* Map Modal */}
+      <Modal visible={!!mapModalTrip} animationType="slide" transparent={false}>
+        <View style={{ flex: 1, backgroundColor: colors.bg }}>
+           <View style={styles.mapModalHeader}>
+             <Text style={styles.modalTitle}>Route: {mapModalTrip?.tripID}</Text>
+             <Pressable onPress={() => setMapModalTrip(null)}>
+               <X size={24} color={colors.textPrimary} />
+             </Pressable>
+           </View>
+           {mapModalTrip && (
+             <FleetMap 
+               trips={[mapModalTrip]} 
+               selectedTrip={mapModalTrip} 
+               onSelectTrip={() => {}} 
+               style={{ flex: 1, height: '100%' }} 
+             />
+           )}
+        </View>
+      </Modal>
 
       {/* ACTION MODAL (Complete/Cancel) */}
       <Modal visible={!!actionModal} transparent={true} animationType="fade" onRequestClose={() => setActionModal(null)}>
@@ -473,6 +504,22 @@ const styles = StyleSheet.create({
   container: { paddingHorizontal: rf(16), paddingVertical: rf(24), paddingBottom: rf(40), flexGrow: 1 },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: rf(20) },
   pageTitle: { color: colors.textPrimary, fontSize: rf(28), fontWeight: '800', letterSpacing: -1 },
+  mapModalHeader: {
+    paddingTop: Platform.OS === 'ios' ? rf(60) : rf(40),
+    paddingHorizontal: rf(20),
+    paddingBottom: rf(16),
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: colors.panel,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderSoft,
+  },
+  modalTitle: {
+    fontSize: rf(16),
+    fontWeight: '800',
+    color: colors.textPrimary,
+  },
   addButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.amber, paddingHorizontal: rf(14), paddingVertical: rf(8), borderRadius: rf(8), gap: rf(6) },
   addButtonText: { color: '#1a1200', fontSize: rf(14), fontWeight: '700' },
   searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: rf(12), paddingHorizontal: rf(16), height: rf(52), marginBottom: rf(20), gap: rf(10) },

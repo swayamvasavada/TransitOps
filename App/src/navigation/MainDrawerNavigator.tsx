@@ -6,6 +6,7 @@ import SettingsScreen from '../screens/SettingsScreen';
 import useAuthStore from '../store/AuthStore';
 import {colors} from '../theme/colors';
 import { User } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const Drawer = createDrawerNavigator();
 
@@ -30,12 +31,19 @@ function CustomDrawerContent(props: any) {
 
 export default function MainDrawerNavigator() {
   const user = useAuthStore(state => state.user);
+  const insets = useSafeAreaInsets();
 
   return (
     <Drawer.Navigator
       drawerContent={props => <CustomDrawerContent {...props} />}
       screenOptions={({ navigation }) => ({
-        headerStyle: { backgroundColor: colors.panel, borderBottomWidth: 0, elevation: 0, shadowOpacity: 0 },
+        headerStyle: { 
+          backgroundColor: colors.panel, 
+          borderBottomWidth: 0, 
+          elevation: 0, 
+          shadowOpacity: 0,
+        },
+        headerStatusBarHeight: insets.top,
         headerTintColor: colors.textPrimary,
         drawerStyle: { backgroundColor: colors.panel },
         drawerActiveTintColor: colors.amber,

@@ -24,8 +24,10 @@ import {
 import { colors } from '../theme/colors';
 import { rf } from '../theme/responsive';
 import { useAttendanceStore } from '../store/AttendanceStore';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
+const GRID_ITEM_WIDTH = Math.floor((width - 88) / 3); // (width - 32 for menu - 32 for padding - 24 for gaps) / 3
 
 const getIcon = (routeName: string, color: string, size: number) => {
   switch (routeName) {
@@ -86,6 +88,7 @@ export default function CustomTabBar({ state, descriptors, navigation }: any) {
   const animation = useSharedValue(0);
   const { status } = useAttendanceStore();
   const isClockedIn = status === 'CLOCKED_IN';
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     animation.value = withTiming(isMoreOpen ? 1 : 0, {
@@ -170,8 +173,14 @@ export default function CustomTabBar({ state, descriptors, navigation }: any) {
         </View>
       </Animated.View>
 
-      {/* Floating Pill Bottom Tab */}
-      <View style={styles.pillContainer}>
+      {/* Bottom Tab Bar (Flush with bottom, rounded top) */}
+      <View style={[
+        styles.pillContainer, 
+        { 
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 12,
+          height: 64 + (insets.bottom > 0 ? insets.bottom : 12)
+        }
+      ]}>
         {primaryRoutes.map((route: any, index: number) => {
           const isFocused = state.index === index;
           const color = isFocused ? colors.amber : colors.textMuted;
@@ -224,7 +233,7 @@ export default function CustomTabBar({ state, descriptors, navigation }: any) {
 const styles = StyleSheet.create({
   wrapper: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 0,
     left: 0,
     right: 0,
     justifyContent: 'flex-end',
@@ -242,9 +251,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: colors.panel,
     width: '100%',
-    paddingBottom: rf(24), // spacing for bottom edge
     paddingTop: 8,
-    height: 70 + rf(24),
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     elevation: 20,
@@ -252,6 +259,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -5 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     borderTopWidth: 1,
     borderTopColor: 'rgba(0, 0, 0, 0.05)',
   },
@@ -321,7 +330,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   gridItem: {
-    width: '31%', // Fits 3 items per row with gap
+    width: GRID_ITEM_WIDTH,
     aspectRatio: 1, // square-ish
     alignItems: 'center',
     justifyContent: 'center',
