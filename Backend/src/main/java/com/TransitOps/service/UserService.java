@@ -28,6 +28,9 @@ public class UserService {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private com.TransitOps.dao.TripDAO tripDAO;
+
     public void createUser(UserDTO userDTO) throws Exception {
         if (userDAO.existsByEmail(userDTO.getEmail())) {
             throw new Exception("Email already exists!");
@@ -78,9 +81,12 @@ public class UserService {
             if (com.TransitOps.util.Role.ROLE_DRIVER.equals(u.getRole())) {
                 Driver driver = driverDAO.findByUserAndActive(u, true);
                 if (driver != null) {
-                    dto.setDriverStatus(driver.getStatus());
+                    dto.setStatus(driver.getStatus());
                     dto.setSafetyScore(driver.getSafetyScore());
                     dto.setDriverID(driver.getDriverID());
+                    dto.setLicenseNo(driver.getLicenseNo());
+                    dto.setLicenseExpiryDate(driver.getLicenseExpiryDate());
+                    dto.setCompletedTrips(tripDAO.countByDriverAndStatusAndActive(driver, com.TransitOps.util.TripStatus.COMPLETED, true));
                 }
             }
             return dto;

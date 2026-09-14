@@ -23,7 +23,8 @@ public class UserDTO {
     private Date licenseExpiryDate;
     private Role role;
     // Driver-specific fields (only populated when role is ROLE_DRIVER)
-    private DriverStatus driverStatus;
+    private DriverStatus status;
     private Double safetyScore;
     private Long driverID;
+    private Long completedTrips;
 }
