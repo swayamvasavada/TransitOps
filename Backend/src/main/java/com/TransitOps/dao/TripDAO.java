@@ -10,4 +10,5 @@ public interface TripDAO extends JpaRepository<Trip, Long> {
     List<Trip> findByStatusAndActive(com.TransitOps.util.TripStatus status, Boolean active);
     List<Trip> findByActive(Boolean active);
     java.util.Optional<Trip> findByTripIDAndActive(Long tripID, Boolean active);
+    Long countByDriverAndStatusAndActive(com.TransitOps.entity.Driver driver, com.TransitOps.util.TripStatus status, Boolean active);
 }
